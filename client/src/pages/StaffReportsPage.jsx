@@ -96,6 +96,12 @@ export function StaffReportsPage() {
     const availNum = Number(availableBeds);
     const totalNum = Number(totalBeds);
 
+    if (availNum < 0 || totalNum < 0) {
+      setError('Validation error: Bed counts cannot be negative.');
+      setBusy(false);
+      return;
+    }
+
     if (availNum > totalNum) {
       setError('Validation error: Available beds cannot exceed total beds.');
       setBusy(false);
@@ -103,28 +109,15 @@ export function StaffReportsPage() {
     }
 
     try {
-      // First attempt the atomic domain availability report endpoint
-      try {
-        await apiRequest(`/api/staff/facilities/${selectedFacilityId}/availability-reports`, {
-          method: 'POST',
-          body: JSON.stringify({
-            category,
-            availableBeds: availNum,
-            totalBeds: totalNum,
-            source: 'staff_portal_web',
-          }),
-        });
-      } catch (staffErr) {
-        // Fallback to legacy admin patch if staff endpoint returned error
-        await apiRequest(`/api/admin/hospitals/${selectedFacilityId}`, {
-          method: 'PATCH',
-          body: JSON.stringify({
-            beds: {
-              [category]: availNum,
-            },
-          }),
-        });
-      }
+      await apiRequest(`/api/staff/facilities/${selectedFacilityId}/availability-reports`, {
+        method: 'POST',
+        body: JSON.stringify({
+          category,
+          availableBeds: availNum,
+          totalBeds: totalNum,
+          source: 'staff_portal_web',
+        }),
+      });
 
       setSuccessMsg(`✓ Capacity report submitted for ${category.toUpperCase()} ward (${availNum}/${totalNum} beds).`);
       await loadHistory();

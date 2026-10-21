@@ -5,12 +5,17 @@ import { useAuth } from '../context/AuthContext.jsx';
 const DEMO_PRESETS = [
   {
     label: 'Facility Reporter (MGM GH)',
-    email: 'reporter.mgm@careroute.local',
+    email: 'reporter@mgmgh.local',
     role: 'facility_reporter',
   },
   {
-    label: 'Organization Admin (Trichy Health)',
-    email: 'admin.trichy@careroute.local',
+    label: 'Org Admin (Govt Hospitals)',
+    email: 'admin@careroute.local',
+    role: 'organization_admin',
+  },
+  {
+    label: 'Org Admin (Apollo Trichy)',
+    email: 'admin@apollo-trichy.local',
     role: 'organization_admin',
   },
   {
@@ -25,7 +30,7 @@ export function StaffLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState(() => (isFirebaseMode ? '' : 'admin.trichy@careroute.local'));
+  const [email, setEmail] = useState(() => (isFirebaseMode ? '' : 'admin@careroute.local'));
   const [password, setPassword] = useState(() => (isFirebaseMode ? '' : 'demo-password-123'));
   const [localError, setLocalError] = useState('');
 

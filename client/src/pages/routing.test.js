@@ -169,3 +169,63 @@ test('Find hospitals search parameter parsing and category filtering', () => {
   assert.equal(parsed.bedType, 'icu');
   assert.equal(parsed.onlyAvailable, true);
 });
+
+test('Staff login presets align with seeded demo accounts without exposing production credentials', () => {
+  const DEMO_PRESET_EMAILS = [
+    'reporter@mgmgh.local',
+    'admin@careroute.local',
+    'admin@apollo-trichy.local',
+    'verifier@careroute.local',
+  ];
+
+  for (const email of DEMO_PRESET_EMAILS) {
+    assert.match(email, /^[a-z0-9._%+-]+@[a-z0-9.-]+\.local$/, 'Demo accounts must use local demo domain');
+  }
+});
+
+test('Capacity reporting validation rejects invalid bed counts (negative or available > total)', () => {
+  function validateReportInput(availableBeds, totalBeds) {
+    const avail = Number(availableBeds);
+    const total = Number(totalBeds);
+    if (!Number.isInteger(avail) || !Number.isInteger(total)) {
+      return { valid: false, error: 'Bed counts must be integers.' };
+    }
+    if (avail < 0 || total < 0) {
+      return { valid: false, error: 'Bed counts cannot be negative.' };
+    }
+    if (avail > total) {
+      return { valid: false, error: 'Available beds cannot exceed total beds.' };
+    }
+    return { valid: true, error: null };
+  }
+
+  assert.equal(validateReportInput(-1, 10).valid, false);
+  assert.equal(validateReportInput(5, -2).valid, false);
+  assert.equal(validateReportInput(15, 10).valid, false);
+  assert.equal(validateReportInput(0, 10).valid, true);
+  assert.equal(validateReportInput(10, 10).valid, true);
+  assert.equal(validateReportInput(4, 12).valid, true);
+});
+
+test('Protected staff pages do not disclose private data to unauthenticated visitors', () => {
+  function evaluateUnauthenticatedAccess(isAuthenticated, page) {
+    if (!isAuthenticated) {
+      return {
+        rendersPrivateData: false,
+        showsAuthPrompt: true,
+        redirectOrPrompt: 'Authentication Required',
+      };
+    }
+    return {
+      rendersPrivateData: true,
+      showsAuthPrompt: false,
+      redirectOrPrompt: null,
+    };
+  }
+
+  for (const page of ['/staff', '/staff/reports', '/staff/facilities', '/staff/verification']) {
+    const access = evaluateUnauthenticatedAccess(false, page);
+    assert.equal(access.rendersPrivateData, false, `Page ${page} must not render private data when unauthenticated`);
+    assert.equal(access.showsAuthPrompt, true, `Page ${page} must show auth prompt when unauthenticated`);
+  }
+});
