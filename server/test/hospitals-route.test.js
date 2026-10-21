@@ -40,3 +40,29 @@ test('GET /api/hospitals returns normalized meta with dataMode and isDemo', asyn
     server.close();
   }
 });
+
+test('GET /health and /api/health respond with 200 OK for hosting health probes', async () => {
+  const app = express();
+  const handleHealth = (_req, res) => {
+    res.json({ status: 'ok', service: 'careroute-api' });
+  };
+  app.get('/health', handleHealth);
+  app.get('/api/health', handleHealth);
+
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const resRootHealth = await fetch(`http://127.0.0.1:${port}/health`);
+    assert.equal(resRootHealth.status, 200);
+    const bodyRoot = await resRootHealth.json();
+    assert.equal(bodyRoot.status, 'ok');
+
+    const resApiHealth = await fetch(`http://127.0.0.1:${port}/api/health`);
+    assert.equal(resApiHealth.status, 200);
+    const bodyApi = await resApiHealth.json();
+    assert.equal(bodyApi.status, 'ok');
+  } finally {
+    server.close();
+  }
+});

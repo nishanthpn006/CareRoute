@@ -30,8 +30,8 @@ export function StaffLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState(() => (isFirebaseMode ? '' : 'admin@careroute.local'));
-  const [password, setPassword] = useState(() => (isFirebaseMode ? '' : 'demo-password-123'));
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState('');
 
   const destination = location.state?.from || '/staff';
@@ -55,7 +55,6 @@ export function StaffLoginPage() {
 
   function applyPreset(preset) {
     setEmail(preset.email);
-    setPassword('demo-password-123');
     setLocalError('');
   }
 
@@ -77,7 +76,7 @@ export function StaffLoginPage() {
         {/* Demo Mode Quick Credentials Selector */}
         {!isFirebaseMode && (
           <div className="demo-credentials-box">
-            <span className="demo-credentials-title">Demo Mode Roles (Click to fill):</span>
+            <span className="demo-credentials-title">Demo Mode Roles (Click to fill email):</span>
             <div className="demo-presets-list">
               {DEMO_PRESETS.map((p) => (
                 <button
@@ -90,7 +89,7 @@ export function StaffLoginPage() {
                 </button>
               ))}
             </div>
-            <small className="hint">Password pre-filled: <code>demo-password-123</code></small>
+            <small className="hint">Select a role to populate email. Enter the password configured in your server deployment environment.</small>
           </div>
         )}
 

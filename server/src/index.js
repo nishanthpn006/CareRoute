@@ -16,9 +16,11 @@ app.use(helmet());
 app.use(cors({ origin: config.corsOrigin, credentials: false }));
 app.use(express.json({ limit: '100kb' }));
 
-app.get('/api/health', (_req, res) => {
+const handleHealth = (_req, res) => {
   res.json({ status: 'ok', service: 'careroute-api', dataMode: config.dataMode, timestamp: new Date().toISOString() });
-});
+};
+app.get('/health', handleHealth);
+app.get('/api/health', handleHealth);
 app.use('/api/auth', authRouter);
 app.use('/api/hospitals', hospitalsRouter);
 app.use('/api/admin', adminRouter);
