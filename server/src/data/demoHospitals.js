@@ -1,0 +1,56 @@
+import { randomUUID } from 'node:crypto';
+
+const now = new Date().toISOString();
+
+// Fictional demonstration data only. Names, addresses, coordinates, phone numbers,
+// services, and bed counts do not represent real facilities or actual availability.
+export const demoHospitals = [
+  {
+    id: randomUUID(),
+    name: 'Demo Emergency Hospital — Central',
+    address: 'Illustrative demo address, Central Zone',
+    city: 'Demo City',
+    state: 'Tamil Nadu',
+    postalCode: '000001',
+    phone: '0000000000',
+    latitude: 13.0827,
+    longitude: 80.2707,
+    services: ['Emergency', 'General Medicine', 'ICU', 'Oxygen Support'],
+    beds: { general: 18, icu: 3, oxygen: 5, ventilator: 1 },
+    operatingStatus: 'open',
+    isDemo: true,
+    updatedAt: now,
+  },
+  {
+    id: randomUUID(),
+    name: 'Demo Medical Centre — North',
+    address: 'Illustrative demo address, North Zone',
+    city: 'Demo City',
+    state: 'Tamil Nadu',
+    postalCode: '000002',
+    phone: '0000000000',
+    latitude: 13.1155,
+    longitude: 80.2872,
+    services: ['Emergency', 'General Medicine', 'ICU', 'Ventilator Support'],
+    beds: { general: 7, icu: 2, oxygen: 0, ventilator: 2 },
+    operatingStatus: 'open',
+    isDemo: true,
+    updatedAt: now,
+  },
+  {
+    id: randomUUID(),
+    name: 'Demo Care Hospital — South',
+    address: 'Illustrative demo address, South Zone',
+    city: 'Demo City',
+    state: 'Tamil Nadu',
+    postalCode: '000003',
+    phone: '0000000000',
+    latitude: 12.9716,
+    longitude: 80.2206,
+    services: ['Emergency', 'General Medicine', 'Oxygen Support'],
+    beds: { general: 11, icu: 0, oxygen: 4, ventilator: 0 },
+    operatingStatus: 'open',
+    isDemo: true,
+    updatedAt: now,
+  },
+];

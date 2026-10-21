@@ -1,0 +1,65 @@
+import 'dotenv/config';
+
+const dataMode = (process.env.DATA_MODE || 'demo').trim().toLowerCase();
+if (!['demo', 'firebase'].includes(dataMode)) {
+  throw new Error('DATA_MODE must be either "demo" or "firebase".');
+}
+
+export const config = {
+  port: Number(process.env.PORT || 4000),
+  dataMode,
+  corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:5173')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean),
+  jwtSecret: (process.env.JWT_SECRET || '').trim(),
+  demoAdminEmail: (process.env.DEMO_ADMIN_EMAIL || '').trim().toLowerCase(),
+  demoAdminPassword: process.env.DEMO_ADMIN_PASSWORD || '',
+  adminEmails: (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean),
+  firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+  firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+};
+
+if (config.dataMode === 'demo') {
+  console.warn('[CareRoute] DATA_MODE=demo: sample facilities and bed counts are fictional and reset when the server restarts.');
+  const missing = [
+    ['JWT_SECRET', config.jwtSecret],
+    ['DEMO_ADMIN_EMAIL', config.demoAdminEmail],
+    ['DEMO_ADMIN_PASSWORD', config.demoAdminPassword],
+  ].filter(([, value]) => !value).map(([name]) => name);
+
+  if (missing.length) {
+    throw new Error(`Demo mode requires explicit environment variables: ${missing.join(', ')}. Set them in server/.env or your runtime environment.`);
+  }
+
+  if (config.jwtSecret.length < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters long.');
+  }
+}
+
+if (config.dataMode === 'firebase') {
+  const isEmulator = Boolean(process.env.FIRESTORE_EMULATOR_HOST);
+  if (isEmulator) {
+    config.firebaseProjectId = config.firebaseProjectId || 'demo-careroute';
+  } else {
+    const missing = [
+      ['FIREBASE_PROJECT_ID', config.firebaseProjectId],
+      ['FIREBASE_CLIENT_EMAIL', config.firebaseClientEmail],
+      ['FIREBASE_PRIVATE_KEY', config.firebasePrivateKey],
+    ].filter(([, value]) => !value).map(([name]) => name);
+    if (missing.length) {
+      throw new Error(`Firebase mode is missing required environment variables: ${missing.join(', ')}`);
+    }
+  }
+  if (!config.adminEmails.length) {
+    if (isEmulator) {
+      config.adminEmails = ['admin@careroute.local'];
+    } else {
+      throw new Error('Firebase mode requires at least one email in ADMIN_EMAILS.');
+    }
+  }
+}

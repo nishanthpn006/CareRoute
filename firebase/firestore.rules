@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All application data access goes through the Express API.
+    // Firebase Admin SDK on the server bypasses these client security rules.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
