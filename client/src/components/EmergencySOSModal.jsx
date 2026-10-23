@@ -101,14 +101,14 @@ export function EmergencySOSModal({ isOpen, onClose }) {
               href={sosAction.telLink}
               className="sos-call-card sos-test-card"
               id="sos-call-test-btn"
-              aria-label="Test Call — Personal Number"
+              aria-label="Test call (development only)"
             >
               <div className="sos-card-content">
                 <span className="sos-icon-circle sos-test-icon">🧪</span>
                 <div className="sos-text">
-                  <span className="sos-number">Test Call — Personal Number</span>
-                  <span className="sos-label">Development Test Override (VITE_SOS_TEST_NUMBER)</span>
-                  <span className="sos-desc">Connects to your configured personal phone to test link handling</span>
+                  <span className="sos-number">Test Call</span>
+                  <span className="sos-label">Test call (development only)</span>
+                  <span className="sos-desc">Opens configured test dialler to verify link handling</span>
                 </div>
               </div>
               <span className="sos-arrow" aria-hidden="true">↗</span>
@@ -156,10 +156,10 @@ export function EmergencySOSModal({ isOpen, onClose }) {
         {/* Desktop Browser Dialer Guidance */}
         <div className="sos-desktop-notice">
           <span className="sos-info-icon" aria-hidden="true">ℹ️</span>
-          <div>
-            <strong>Calling from a desktop computer?</strong>
+          <div className="sos-desktop-notice-text">
+            <strong>Calling from a desktop computer or laptop?</strong>
             <p>
-              If your browser or device lacks a phone app (e.g. standard PC or Mac), pick up your mobile phone and dial <strong>112</strong> or <strong>108</strong> directly.
+              If your browser or device lacks a phone app, pick up your mobile phone and dial <span className="sos-dial-highlight">112</span> or <span className="sos-dial-highlight">108</span> directly.
             </p>
           </div>
         </div>
@@ -181,8 +181,8 @@ export function EmergencySOSModal({ isOpen, onClose }) {
 /**
  * SOSHeaderButton — Topbar SOS Trigger
  * 
- * In development mode with VITE_SOS_TEST_NUMBER configured, renders an anchor link
- * directly using `tel:<configured-number>` and labeled "Test Call — Personal Number".
+ * In development mode with a test number configured, renders an anchor link
+ * using `tel:<configured-number>` and labeled "Test call (development only)".
  * In production or without a valid test number, renders the official "SOS / Call 112"
  * button that triggers the emergency modal dialog.
  */
@@ -195,10 +195,10 @@ export function SOSHeaderButton({ onClick }) {
         href={sosAction.telLink}
         className="sos-header-trigger sos-header-test-trigger"
         id="header-sos-btn"
-        aria-label="Test Call — Personal Number"
+        aria-label="Test call (development only)"
       >
         <span className="sos-beacon sos-beacon-test" aria-hidden="true" />
-        <span className="sos-btn-text">Test Call — Personal Number</span>
+        <span className="sos-btn-text">Test call (development only)</span>
       </a>
     );
   }
@@ -232,7 +232,7 @@ export function SOSMobileFloatingButton({ onClick }) {
         href={sosAction.telLink}
         className="sos-floating-mobile-trigger sos-floating-test-trigger"
         id="mobile-floating-sos-btn"
-        aria-label="Test Call — Personal Number"
+        aria-label="Test call (development only)"
       >
         <span className="sos-floating-icon">🧪</span>
         <span className="sos-floating-label">Test Call</span>

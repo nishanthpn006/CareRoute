@@ -32,6 +32,7 @@ export function StaffLoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRoleEmail, setSelectedRoleEmail] = useState('');
   const [localError, setLocalError] = useState('');
 
   const destination = location.state?.from || '/staff';
@@ -55,6 +56,7 @@ export function StaffLoginPage() {
 
   function applyPreset(preset) {
     setEmail(preset.email);
+    setSelectedRoleEmail(preset.email);
     setLocalError('');
   }
 
@@ -63,7 +65,7 @@ export function StaffLoginPage() {
       <div className="admin-login">
         <span className="eyebrow">CareRoute Staff Portal</span>
         <h2>Authorized Personnel Sign In</h2>
-        <p>
+        <p className="auth-description">
           Secure workspace for facility reporters, organization administrators, and platform verifiers.
         </p>
 
@@ -75,46 +77,68 @@ export function StaffLoginPage() {
 
         {/* Demo Mode Quick Credentials Selector */}
         {!isFirebaseMode && (
-          <div className="demo-credentials-box">
-            <span className="demo-credentials-title">Demo Mode Roles (Click to fill email):</span>
-            <div className="demo-presets-list">
-              {DEMO_PRESETS.map((p) => (
-                <button
-                  key={p.email}
-                  type="button"
-                  className="button button-outline button-sm preset-btn"
-                  onClick={() => applyPreset(p)}
-                >
-                  {p.label}
-                </button>
-              ))}
+          <>
+            <div className="demo-credentials-box">
+              <span className="demo-credentials-title">Demo Mode Roles (Click to fill email):</span>
+              <div className="demo-presets-grid" role="group" aria-label="Demo role quick selection">
+                {DEMO_PRESETS.map((p) => {
+                  const isSelected = selectedRoleEmail === p.email && email === p.email;
+                  return (
+                    <button
+                      key={p.email}
+                      type="button"
+                      className={`preset-btn ${isSelected ? 'preset-btn-selected' : ''}`}
+                      onClick={() => applyPreset(p)}
+                      aria-pressed={isSelected}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="demo-credentials-hint">
+                Choose a demo role to fill the email field. Enter the password supplied for your demo environment.
+              </p>
             </div>
-            <small className="hint">Select a role to populate email. Enter the password configured in your server deployment environment.</small>
-          </div>
+
+            <div className="demo-password-row" aria-label="Demo environment credentials">
+              <span className="demo-password-label">Demo Password:</span>
+              <code className="demo-password-val" title="Selectable demo password">demo-password-123</code>
+            </div>
+          </>
         )}
 
-        <form onSubmit={handleSubmit} className="form-stack">
-          <label>
-            <span>Staff Email Address</span>
+        <form onSubmit={handleSubmit} className="auth-form-stack">
+          <label className="auth-field-label" htmlFor="staff-email">
+            <span className="field-label-text">Staff Email Address</span>
             <input
+              id="staff-email"
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. reporter@hospital.gov.in"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (selectedRoleEmail && e.target.value !== selectedRoleEmail) {
+                  setSelectedRoleEmail('');
+                }
+              }}
+              placeholder="e.g. reporter@mgmgh.local"
               autoComplete="username"
+              className="auth-input"
             />
           </label>
 
-          <label>
-            <span>Password</span>
+          <label className="auth-field-label" htmlFor="staff-password">
+            <span className="field-label-text">Password</span>
             <input
+              id="staff-password"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               autoComplete="current-password"
+              className="auth-input"
             />
           </label>
 
@@ -129,7 +153,7 @@ export function StaffLoginPage() {
 
         <div className="auth-footer-note">
           <p className="muted">
-            Authorization and facility tenancy are enforced cryptographically by the server. Only assigned facilities can be updated.
+            Your access is limited by your role and assigned facilities.
           </p>
         </div>
       </div>

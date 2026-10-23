@@ -23,6 +23,7 @@ export default function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/find-hospitals" element={<FindHospitalsPage />} />
+            <Route path="/hospitals" element={<FindHospitalsPage />} />
             <Route path="/hospitals/:facilityId" element={<HospitalDetailPage />} />
             <Route path="/emergency" element={<EmergencyPage />} />
             <Route path="/staff/login" element={<StaffLoginPage />} />

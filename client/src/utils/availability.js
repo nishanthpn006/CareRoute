@@ -26,7 +26,24 @@ export const BED_DEFINITIONS = [
 export function getBedAvailabilityStatus(hospital, bedKey) {
   const availMap = hospital?.availability || {};
   const snapshot = availMap[bedKey];
-  const freshnessState = snapshot?.freshnessState || 'UNKNOWN';
+
+  let freshnessState = snapshot?.freshnessState;
+  if (!freshnessState && snapshot?.reportedAt) {
+    const d = new Date(snapshot.reportedAt);
+    if (!Number.isNaN(d.getTime())) {
+      const ageMs = Date.now() - d.getTime();
+      if (ageMs < -60000) {
+        freshnessState = 'UNKNOWN';
+      } else if (ageMs <= 15 * 60 * 1000) {
+        freshnessState = 'FRESH';
+      } else if (ageMs <= 60 * 60 * 1000) {
+        freshnessState = 'OVERDUE';
+      } else {
+        freshnessState = 'STALE';
+      }
+    }
+  }
+  freshnessState = freshnessState || 'UNKNOWN';
 
   // If no snapshot exists or state is UNKNOWN
   if (!snapshot || freshnessState === 'UNKNOWN') {
@@ -237,3 +254,132 @@ export function formatConfirmedBedsSummary(confirmedCount, hospitals = [], selec
     hasActiveReports: false,
   };
 }
+
+export const WARD_NAMES = Object.freeze({
+  general: 'General Inpatient Ward',
+  icu: 'Intensive Care Unit (ICU)',
+  hdu: 'High Dependency Unit (HDU)',
+  pediatric: 'Pediatric Emergency Ward',
+});
+
+/**
+ * Calculates detailed aggregate and per-ward availability summary for a single hospital card.
+ * Respects strict semantic accuracy: never converts unreported wards to zero.
+ * 
+ * @param {Object} hospital - Public facility record
+ * @param {string} selectedBed - 'all' or bed category key
+ * @returns {Object} Comprehensive hospital availability summary
+ */
+export function getHospitalBedSummary(hospital, selectedBed = 'all') {
+  const supported = hospital?.supportedBedCategories || ['general', 'icu', 'hdu', 'pediatric'];
+  const categories = selectedBed === 'all'
+    ? BED_DEFINITIONS.filter((b) => supported.includes(b.key))
+    : BED_DEFINITIONS.filter((b) => b.key === selectedBed && supported.includes(b.key));
+
+  const wardStatuses = categories.map((def) => {
+    const stat = getBedAvailabilityStatus(hospital, def.key);
+    const snap = hospital?.availability?.[def.key];
+    const availBeds = typeof stat.availableCount === 'number' ? stat.availableCount : null;
+    const totBeds = typeof stat.totalCount === 'number' ? stat.totalCount : null;
+    const pct = availBeds !== null && totBeds !== null && totBeds > 0
+      ? Math.round((availBeds / totBeds) * 100)
+      : null;
+
+    return {
+      key: def.key,
+      label: def.label,
+      fullName: WARD_NAMES[def.key] || `${def.label} Ward`,
+      ...stat,
+      availableCount: availBeds,
+      totalCount: totBeds,
+      percentage: pct,
+      reportedAt: snap?.reportedAt || null,
+    };
+  });
+
+  // Calculate aggregate metrics across valid reports
+  let validReportCount = 0;
+  let totalAvailable = 0;
+  let totalCapacity = 0;
+  let hasConfirmed = false;
+  let hasStale = false;
+  let latestReportedAt = null;
+
+  for (const ward of wardStatuses) {
+    if (ward.isNumeric && ward.availableCount !== null && ward.totalCount !== null) {
+      validReportCount += 1;
+      totalAvailable += ward.availableCount;
+      totalCapacity += ward.totalCount;
+      if (ward.isConfirmed) {
+        hasConfirmed = true;
+      }
+      if (ward.reportedAt) {
+        if (!latestReportedAt || new Date(ward.reportedAt) > new Date(latestReportedAt)) {
+          latestReportedAt = ward.reportedAt;
+        }
+      }
+    } else if (ward.freshnessState === 'STALE' && ward.availableCount !== null && ward.totalCount !== null) {
+      validReportCount += 1;
+      hasStale = true;
+      totalAvailable += ward.availableCount;
+      totalCapacity += ward.totalCount;
+      if (ward.reportedAt) {
+        if (!latestReportedAt || new Date(ward.reportedAt) > new Date(latestReportedAt)) {
+          latestReportedAt = ward.reportedAt;
+        }
+      }
+    }
+  }
+
+  // If no ward has been reported
+  if (validReportCount === 0) {
+    return {
+      hasReport: false,
+      headlineCount: null,
+      totalCapacity: null,
+      percentage: null,
+      isFull: false,
+      isStale: false,
+      isPartial: false,
+      subtext: 'Bed availability not yet reported',
+      reportedWardCount: 0,
+      totalSupportedWards: categories.length,
+      latestReportedAt: null,
+      wardStatuses,
+    };
+  }
+
+  const isFull = totalAvailable === 0;
+  const percentage = totalCapacity > 0 ? Math.round((totalAvailable / totalCapacity) * 100) : 0;
+  const isPartial = selectedBed === 'all' && validReportCount < categories.length;
+  const isStale = !hasConfirmed && hasStale;
+
+  let subtext = '';
+  if (isFull) {
+    subtext = `0 beds available out of ${totalCapacity} total beds (Wards full)`;
+  } else if (isPartial) {
+    subtext = `${totalAvailable} beds available out of ${totalCapacity} total beds (${validReportCount} of ${categories.length} wards reporting)`;
+  } else {
+    subtext = `${totalAvailable} beds available out of ${totalCapacity} total beds`;
+  }
+
+  if (isStale) {
+    subtext = `${totalAvailable} unconfirmed beds (>60m ago) out of ${totalCapacity} total capacity`;
+  }
+
+  return {
+    hasReport: true,
+    headlineCount: totalAvailable,
+    totalCapacity,
+    percentage,
+    isFull,
+    isStale,
+    isPartial,
+    subtext,
+    reportedWardCount: validReportCount,
+    totalSupportedWards: categories.length,
+    latestReportedAt,
+    wardStatuses,
+  };
+}
+

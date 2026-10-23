@@ -88,19 +88,34 @@ export function FindHospitalsPage() {
     return () => window.clearInterval(pollId);
   }, [refreshHospitals]);
 
+  const [locationBusy, setLocationBusy] = useState(false);
+
   function locateMe() {
     setLocationMessage('');
     if (!navigator.geolocation) {
       setLocationMessage('Geolocation is not supported by this browser.');
       return;
     }
+    setLocationBusy(true);
     setLocationMessage('Requesting device location…');
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setUserLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
         setLocationMessage('Location captured in this browser.');
+        setLocationBusy(false);
       },
-      (error) => setLocationMessage(error.code === 1 ? 'Location permission was denied. You can still search manually.' : 'Could not determine your location. Try again or search manually.'),
+      (error) => {
+        setLocationBusy(false);
+        if (error.code === 1) {
+          setLocationMessage('Location permission was denied. You can still search manually.');
+        } else if (error.code === 2) {
+          setLocationMessage('Device location is unavailable. Check your device settings.');
+        } else if (error.code === 3) {
+          setLocationMessage('Location request timed out. Please try again.');
+        } else {
+          setLocationMessage('Could not determine your location. Try again or search manually.');
+        }
+      },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
     );
   }
@@ -243,26 +258,23 @@ export function FindHospitalsPage() {
 
   return (
     <main className="page finder-page">
-      {/* Pilot Prototype Disclosure */}
-      {meta.isDemo ? (
-        <div className="demo-notice" role="note">
-          <span className="notice-icon" aria-hidden="true">i</span>
-          <div>
-            <strong>Tiruchirappalli District Pilot Prototype — Not an emergency dispatch service.</strong>
-            <p>
-              Facility coordinates and profiles are verified from district listings. Bed counts are staff-reported and must be confirmed directly with the facility. In a life-threatening emergency, dial 112 or 108 immediately.
-            </p>
+      {/* 1. Header & Compact Safety Notice */}
+      <header className="finder-page-header">
+        <div className="finder-title-area">
+          <span className="finder-kicker">District Hospital Directory & Live Route Guidance</span>
+          <h1 className="finder-heading">Find Emergency Hospitals</h1>
+          <p className="finder-subtext">
+            Search verified acute care facilities, emergency trauma centers, and clinical bed availability across Tiruchirappalli district.
+          </p>
+        </div>
+
+        <div className="finder-safety-banner" role="note">
+          <span className="safety-icon" aria-hidden="true">⚠️</span>
+          <div className="safety-text">
+            <strong>Staff-reported capacity:</strong> Availability is updated by hospital staff and requires direct confirmation before travel. In an acute life threat, dial <strong>112</strong> or <strong>108</strong> immediately.
           </div>
         </div>
-      ) : (
-        <div className="info-notice" role="note">
-          <span className="notice-icon" aria-hidden="true">i</span>
-          <div>
-            <strong>Availability is staff-reported.</strong>
-            <p>Confirm bed availability directly with the facility before travelling. This tool is not a medical dispatch or triage service.</p>
-          </div>
-        </div>
-      )}
+      </header>
 
       {apiError && (
         <div className="error-box api-error" role="alert">
@@ -271,12 +283,135 @@ export function FindHospitalsPage() {
         </div>
       )}
 
-      {/* Patient Search Workflow & Filters */}
-      <section className="search-panel" role="search" aria-label="Hospital search and filters">
-        {/* Quick care selection category chips */}
-        <div className="quick-category-section">
-          <span className="quick-category-title">Emergency care requirement:</span>
-          <div className="quick-category-chips" role="group" aria-label="Quick care categories">
+      {/* 2. Deliberate Search & Filter Toolbar */}
+      <section className="finder-toolbar" role="search" aria-label="Hospital search and filters">
+        {/* Toolbar Row 1: Wide Hospital / Locality / Capability Search */}
+        <div className="finder-search-row">
+          <div className="finder-search-input-wrap">
+            <span className="finder-search-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <input
+              type="search"
+              className="finder-main-search-input"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search hospital by name, locality or medical capability (e.g. MGM GH, Apollo, ICU, Trauma)..."
+              aria-label="Search hospital by name, locality or capability"
+            />
+            {query && (
+              <button
+                type="button"
+                className="finder-clear-btn"
+                onClick={() => setQuery('')}
+                aria-label="Clear search input"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="finder-toolbar-actions">
+            <button
+              type="button"
+              className={`button ${userLocation ? 'button-primary' : 'button-outline'} finder-locate-btn`}
+              onClick={locateMe}
+              disabled={locationBusy}
+              aria-label="Use browser location to calculate road travel distance"
+            >
+              {locationBusy ? 'Locating…' : userLocation ? '✓ Location Active' : '📍 Use My Location'}
+            </button>
+            {(userLocation || query || city || service !== 'all' || bedType !== 'all' || availableOnly) && (
+              <button
+                type="button"
+                className="button button-quiet finder-reset-btn"
+                onClick={() => {
+                  setQuery('');
+                  setCity('');
+                  setService('all');
+                  setBedType('all');
+                  setAvailableOnly(false);
+                  setUserLocation(null);
+                  setLocationMessage('');
+                  setActiveRoute(null);
+                  setDrivingTable({});
+                }}
+              >
+                Reset filters
+              </button>
+            )}
+          </div>
+        </div>
+
+        {locationMessage && (
+          <div className="finder-location-feedback" role="status">
+            {locationMessage}
+          </div>
+        )}
+
+        {/* Toolbar Row 2: Aligned Filter Controls Grid */}
+        <div className="finder-filter-grid">
+          <div className="finder-filter-field">
+            <label htmlFor="finder-filter-city">City / Locality</label>
+            <input
+              id="finder-filter-city"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="All localities (e.g. Srirangam, Thillai Nagar)..."
+              aria-label="Filter by locality"
+            />
+          </div>
+
+          <div className="finder-filter-field">
+            <label htmlFor="finder-filter-bed">Required Bed Category</label>
+            <select
+              id="finder-filter-bed"
+              value={bedType}
+              onChange={(e) => setBedType(e.target.value)}
+              aria-label="Filter by required bed category"
+            >
+              <option value="all">Any bed category</option>
+              {BED_DEFINITIONS.map((bed) => (
+                <option key={bed.key} value={bed.key}>{bed.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="finder-filter-field">
+            <label htmlFor="finder-filter-service">Clinical Capability</label>
+            <select
+              id="finder-filter-service"
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              aria-label="Filter by clinical capability"
+            >
+              <option value="all">Any clinical capability</option>
+              {SERVICE_OPTIONS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="finder-filter-field finder-filter-toggle">
+            <label className="checkbox-label" htmlFor="finder-available-only">
+              <input
+                id="finder-available-only"
+                type="checkbox"
+                checked={availableOnly}
+                onChange={(e) => setAvailableOnly(e.target.checked)}
+              />
+              <span>Only confirmed available beds</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Toolbar Row 3: Emergency Care Quick Filters */}
+        <div className="finder-quick-filters">
+          <span className="quick-filter-heading">Emergency need:</span>
+          <div className="quick-filter-chips" role="group" aria-label="Quick care category filters">
             {QUICK_CARE_CATEGORIES.map((cat) => {
               const isActive =
                 (cat.id === 'all' && service === 'all' && bedType === 'all') ||
@@ -286,7 +421,7 @@ export function FindHospitalsPage() {
                 <button
                   key={cat.id}
                   type="button"
-                  className={`category-chip ${isActive ? 'category-chip-active' : ''}`}
+                  className={`quick-chip ${isActive ? 'quick-chip-active' : ''}`}
                   onClick={() => {
                     if (cat.id === 'all') {
                       setService('all');
@@ -306,105 +441,13 @@ export function FindHospitalsPage() {
             })}
           </div>
         </div>
-
-        <div className="search-controls">
-          <label className="search-field">
-            <span>Search hospital, locality or capability</span>
-            <div className="input-with-icon">
-              <span aria-hidden="true">⌕</span>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="e.g. Apollo, MGM GH, Trauma, ICU"
-                aria-label="Search hospital, locality or capability"
-              />
-            </div>
-          </label>
-          <label>
-            <span>City / Locality</span>
-            <input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Tiruchirappalli, Srirangam…"
-              aria-label="Filter by locality"
-            />
-          </label>
-          <label>
-            <span>Required bed category</span>
-            <select
-              value={bedType}
-              onChange={(e) => setBedType(e.target.value)}
-              aria-label="Filter by required bed category"
-            >
-              <option value="all">Any bed category</option>
-              {BED_DEFINITIONS.map((bed) => (
-                <option key={bed.key} value={bed.key}>{bed.label}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>Clinical capability</span>
-            <select
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              aria-label="Filter by clinical capability"
-            >
-              <option value="all">Any capability</option>
-              {SERVICE_OPTIONS.map((option) => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <div className="search-footer">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={availableOnly}
-              onChange={(e) => setAvailableOnly(e.target.checked)}
-            />
-            <span>Only show facilities with confirmed available beds</span>
-          </label>
-
-          <div className="location-actions">
-            {locationMessage && <span className="location-message" role="status">{locationMessage}</span>}
-            <button
-              type="button"
-              className="button button-outline"
-              onClick={locateMe}
-              aria-label="Use browser location to calculate road travel distance"
-            >
-              {userLocation ? 'Location captured ✓' : '◎ Use my location'}
-            </button>
-            {(userLocation || query || city || service !== 'all' || bedType !== 'all' || availableOnly) && (
-              <button
-                type="button"
-                className="button button-quiet clear-filters-btn"
-                onClick={() => {
-                  setQuery('');
-                  setCity('');
-                  setService('all');
-                  setBedType('all');
-                  setAvailableOnly(false);
-                  setUserLocation(null);
-                  setLocationMessage('Filters and location reset.');
-                  setActiveRoute(null);
-                  setDrivingTable({});
-                }}
-              >
-                Reset filters
-              </button>
-            )}
-          </div>
-        </div>
       </section>
 
-      {/* View Mode Switcher */}
-      <div className="map-view-switcher" role="tablist" aria-label="Layout view mode">
+      {/* 3. View Mode Switcher (Map & List, List only, Map only) */}
+      <div className="finder-view-mode-bar" role="tablist" aria-label="Layout view mode">
         <button
           type="button"
-          className={`view-switch-btn ${mapViewMode === 'both' ? 'active' : ''}`}
+          className={`view-mode-btn ${mapViewMode === 'both' ? 'active' : ''}`}
           onClick={() => setMapViewMode('both')}
           role="tab"
           aria-selected={mapViewMode === 'both'}
@@ -413,7 +456,7 @@ export function FindHospitalsPage() {
         </button>
         <button
           type="button"
-          className={`view-switch-btn ${mapViewMode === 'list' ? 'active' : ''}`}
+          className={`view-mode-btn ${mapViewMode === 'list' ? 'active' : ''}`}
           onClick={() => setMapViewMode('list')}
           role="tab"
           aria-selected={mapViewMode === 'list'}
@@ -422,7 +465,7 @@ export function FindHospitalsPage() {
         </button>
         <button
           type="button"
-          className={`view-switch-btn ${mapViewMode === 'map' ? 'active' : ''}`}
+          className={`view-mode-btn ${mapViewMode === 'map' ? 'active' : ''}`}
           onClick={() => setMapViewMode('map')}
           role="tab"
           aria-selected={mapViewMode === 'map'}
@@ -431,37 +474,36 @@ export function FindHospitalsPage() {
         </button>
       </div>
 
-      {/* Dual Column Layout: Hospital List & Interactive Leaflet Map */}
-      <div className="finder-layout">
+      {/* 4. Results-and-Map Workspace (44% Results / 56% Map on Desktop) */}
+      <div className={`finder-workspace view-mode-${mapViewMode}`}>
         {mapViewMode !== 'map' && (
-          <div className="finder-list-column">
-            <section className="results-section">
-              <div className="results-intro">
-                <div>
-                  <span className="eyebrow">Matching facilities</span>
-                  <h2>{userLocation ? 'Ranked by road travel time' : 'Verified facilities'}</h2>
-                  <p className="muted">
-                    {userLocation
-                      ? 'Sorted by estimated OSRM driving duration when available, or straight-line distance. Road travel time is an estimate, not live traffic.'
-                      : 'Turn on location to rank results by travel time, or select any facility on the map.'}
-                  </p>
-                </div>
-                {/* Corrected availability aggregate summary */}
-                <div className="result-total">
-                  <strong className={summaryMeta.countDisplay === '—' ? 'text-muted' : ''}>
-                    {summaryMeta.countDisplay}
-                  </strong>
-                  <span>{summaryMeta.labelDisplay}</span>
-                </div>
+          <div className="finder-results-pane">
+            <div className="results-pane-header">
+              <div className="results-header-left">
+                <span className="results-count-pill">
+                  {filteredHospitals.length} {filteredHospitals.length === 1 ? 'facility' : 'facilities'} found
+                </span>
+                <span className="results-sorting-label">
+                  {userLocation ? '• Sorted by road travel duration' : '• Sorted by availability'}
+                </span>
               </div>
+              <div className="results-header-right">
+                <span className={`results-summary-badge ${summaryMeta.countDisplay === '—' ? 'muted' : ''}`}>
+                  <strong>{summaryMeta.countDisplay}</strong> {summaryMeta.labelDisplay}
+                </span>
+              </div>
+            </div>
 
+            <div className="results-scroll-container">
               {loading ? (
-                <div className="loading-state"><span className="loader" />Fetching facility records…</div>
+                <div className="finder-loading-state">
+                  <span className="loader" /> Fetching hospital records…
+                </div>
               ) : filteredHospitals.length === 0 ? (
-                <div className="empty-state">
-                  <div className="empty-icon">⌕</div>
-                  <h3>No matching facilities</h3>
-                  <p>Try another search, remove a filter, or turn off the confirmed available-bed-only option.</p>
+                <div className="finder-empty-state">
+                  <div className="empty-state-icon">⌕</div>
+                  <h3>No matching facilities found</h3>
+                  <p>Try clearing filters or search terms to see all district hospitals.</p>
                   <button
                     type="button"
                     className="button button-quiet"
@@ -477,7 +519,7 @@ export function FindHospitalsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="hospital-grid">
+                <div className="results-card-list">
                   {filteredHospitals.map((hospital) => (
                     <HospitalCard
                       key={hospital.id}
@@ -491,12 +533,12 @@ export function FindHospitalsPage() {
                   ))}
                 </div>
               )}
-            </section>
+            </div>
           </div>
         )}
 
         {mapViewMode !== 'list' && (
-          <div className="finder-map-column">
+          <div className="finder-map-pane">
             <HospitalMap
               hospitals={filteredHospitals}
               selectedHospital={selectedHospital}
@@ -506,11 +548,16 @@ export function FindHospitalsPage() {
               routingBusy={routingBusy}
               onClearRoute={handleClearRoute}
               selectedBed={bedType}
+              mapViewMode={mapViewMode}
+              onLocateMe={locateMe}
+              locationMessage={locationMessage}
+              locationBusy={locationBusy}
             />
           </div>
         )}
       </div>
 
+      {/* 5. Methodology Note */}
       <section className="method-note">
         <div className="method-symbol">i</div>
         <div>

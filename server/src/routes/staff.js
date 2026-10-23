@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { domainStore } from '../lib/domainStore.js';
 import { authenticate, requireAuth, requireRole, requireFacilityScope } from '../middleware/authorize.js';
 import { ROLES } from '../domain/roles.js';
+import { evaluateAvailabilityFreshness } from '../domain/freshness.js';
 
 export const staffRouter = Router();
 
@@ -40,11 +41,12 @@ staffRouter.get('/facilities', async (req, res, next) => {
 
 /**
  * GET /api/staff/facilities/:facilityId/current
- * Returns current bed availability snapshots for an assigned facility.
+ * Returns current bed availability snapshots for an assigned facility with freshness evaluated.
  */
-staffRouter.get('/facilities/:facilityId/current', requireFacilityScope('manage'), async (req, res, next) => {
+staffRouter.get('/facilities/:facilityId/current', requireFacilityScope('report'), async (req, res, next) => {
   try {
-    const availabilityMap = await domainStore.getFacilityAvailabilityMap(req.facility.id);
+    const rawAvailabilityMap = await domainStore.getFacilityAvailabilityMap(req.facility.id);
+    const availabilityMap = evaluateAvailabilityFreshness(rawAvailabilityMap, Date.now());
     res.json({
       data: availabilityMap,
       facility: {
@@ -62,7 +64,7 @@ staffRouter.get('/facilities/:facilityId/current', requireFacilityScope('manage'
  * GET /api/staff/facilities/:facilityId/availability-reports
  * Returns report history for an assigned facility.
  */
-staffRouter.get('/facilities/:facilityId/availability-reports', requireFacilityScope('manage'), async (req, res, next) => {
+staffRouter.get('/facilities/:facilityId/availability-reports', requireFacilityScope('report'), async (req, res, next) => {
   try {
     const limit = Math.min(Number(req.query.limit || 50), 100);
     const category = req.query.category || null;
@@ -87,6 +89,7 @@ staffRouter.get('/facilities/:facilityId/availability-reports', requireFacilityS
 staffRouter.post('/facilities/:facilityId/availability-reports', requireFacilityScope('report'), async (req, res, next) => {
   try {
     const { category, availableBeds, totalBeds, source } = req.body || {};
+    const now = Date.now();
 
     const result = await domainStore.submitAvailabilityReport({
       facilityId: req.facility.id,
@@ -95,12 +98,23 @@ staffRouter.post('/facilities/:facilityId/availability-reports', requireFacility
       totalBeds,
       user: req.user,
       source: source || 'manual_staff_portal',
-      now: Date.now(),
+      now,
     });
+
+    const evaluatedSnapshot = result.snapshot
+      ? {
+          ...result.snapshot,
+          freshnessState: 'FRESH',
+          isVerifiedAvailability: false,
+        }
+      : result.snapshot;
 
     res.status(201).json({
       message: 'Availability report accepted and published.',
-      data: result,
+      data: {
+        ...result,
+        snapshot: evaluatedSnapshot,
+      },
     });
   } catch (error) {
     if (error.statusCode) {
@@ -109,3 +123,4 @@ staffRouter.post('/facilities/:facilityId/availability-reports', requireFacility
     next(error);
   }
 });
+

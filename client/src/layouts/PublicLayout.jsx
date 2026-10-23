@@ -135,23 +135,25 @@ export function PublicLayout() {
 
       {/* Public Footer */}
       <footer className="footer">
-        <div>
-          <Link to="/" className="brand" aria-label="CareRoute home">
-            <span className="brand-mark">CR</span>
-            <span>
-              <strong>CareRoute</strong>
-              <small>Emergency care finder</small>
-            </span>
-          </Link>
-          <p>
-            CareRoute Tiruchirappalli Pilot Prototype · Official facilities directory and capacity reporting. Verify availability directly with facilities before travel.
-          </p>
-        </div>
-        <div className="footer-links">
-          <Link to="/">Home</Link>
-          <Link to="/find-hospitals">Find Hospitals</Link>
-          <Link to="/emergency">Emergency SOS</Link>
-          <Link to="/staff/login">Staff Portal</Link>
+        <div className="footer-inner">
+          <div className="footer-brand-section">
+            <Link to="/" className="brand" aria-label="CareRoute home">
+              <span className="brand-mark">CR</span>
+              <span>
+                <strong>CareRoute</strong>
+                <small>Emergency care finder</small>
+              </span>
+            </Link>
+            <p className="footer-description">
+              CareRoute Tiruchirappalli Pilot Prototype · Official facilities directory and capacity reporting. Verify availability directly with facilities before travel.
+            </p>
+          </div>
+          <nav className="footer-links" aria-label="Footer Navigation">
+            <Link to="/">Home</Link>
+            <Link to="/find-hospitals">Find Hospitals</Link>
+            <Link to="/emergency">Emergency SOS</Link>
+            <Link to="/staff/login">Staff Portal</Link>
+          </nav>
         </div>
       </footer>
 

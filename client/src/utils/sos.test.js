@@ -39,9 +39,9 @@ test('getSosTestAction in development mode with configured valid number', () => 
   assert.equal(result.isOverrideActive, true);
   assert.equal(result.testNumber, '+919876543210');
   assert.equal(result.telLink, 'tel:+919876543210');
-  assert.equal(result.label, 'Test Call — Personal Number');
-  assert.equal(result.headerLabel, 'Test Call — Personal Number');
-  assert.equal(result.mobileLabel, 'Test Call');
+  assert.equal(result.label, 'Test call (development only)');
+  assert.equal(result.headerLabel, 'Test call (development only)');
+  assert.equal(result.mobileLabel, 'Test call');
   // Confirm it does NOT mislabel a private number as Call 112
   assert.notEqual(result.label, 'Call 112');
   assert.notEqual(result.headerLabel, 'SOS / Call 112');

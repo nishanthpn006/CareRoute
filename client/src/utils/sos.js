@@ -122,8 +122,8 @@ export function getSosTestAction({
     isOverrideActive: true,
     testNumber: validatedNumber,
     telLink: `tel:${validatedNumber}`,
-    label: 'Test Call — Personal Number',
-    headerLabel: 'Test Call — Personal Number',
-    mobileLabel: 'Test Call',
+    label: 'Test call (development only)',
+    headerLabel: 'Test call (development only)',
+    mobileLabel: 'Test call',
   };
 }

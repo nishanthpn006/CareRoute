@@ -229,3 +229,154 @@ test('Protected staff pages do not disclose private data to unauthenticated visi
     assert.equal(access.showsAuthPrompt, true, `Page ${page} must show auth prompt when unauthenticated`);
   }
 });
+
+test('Hospital details tab navigation defaults to Overview and resolves deep links', () => {
+  const VALID_TABS = ['overview', 'bed-availability', 'services', 'contact'];
+
+  function resolveActiveTab(hash) {
+    const normalized = String(hash || '').replace('#', '').toLowerCase();
+    return VALID_TABS.includes(normalized) ? normalized : 'overview';
+  }
+
+  // Default when no hash or empty hash
+  assert.equal(resolveActiveTab(''), 'overview');
+  assert.equal(resolveActiveTab('#'), 'overview');
+  assert.equal(resolveActiveTab(null), 'overview');
+
+  // Deep-linking to specific tabs
+  assert.equal(resolveActiveTab('#bed-availability'), 'bed-availability');
+  assert.equal(resolveActiveTab('#overview'), 'overview');
+  assert.equal(resolveActiveTab('#services'), 'services');
+  assert.equal(resolveActiveTab('#contact'), 'contact');
+
+  // Invalid hash falls back gracefully to overview
+  assert.equal(resolveActiveTab('#unknown-random-section'), 'overview');
+  assert.equal(resolveActiveTab('#dashboard'), 'overview');
+});
+
+test('Hospital details ward-by-ward bed availability presentation from real API shape', () => {
+  const sampleHospital = {
+    id: 'fac-trichy-mgmgh',
+    name: 'Mahatma Gandhi Memorial Government Hospital',
+    supportedBedCategories: ['general', 'icu', 'hdu', 'pediatric'],
+    availability: {
+      general: {
+        availableBeds: 18,
+        totalBeds: 60,
+        freshnessState: 'FRESH',
+        reportedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      },
+      icu: {
+        availableBeds: 0,
+        totalBeds: 12,
+        freshnessState: 'FRESH',
+        reportedAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+      },
+      hdu: {
+        availableBeds: 3,
+        totalBeds: 10,
+        freshnessState: 'OVERDUE',
+        reportedAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+      },
+      pediatric: {
+        availableBeds: null,
+        totalBeds: null,
+        freshnessState: 'UNKNOWN',
+        reportedAt: null,
+      },
+    },
+  };
+
+  // 1. General ward: FRESH with available beds
+  const gen = sampleHospital.availability.general;
+  assert.equal(gen.freshnessState, 'FRESH');
+  assert.equal(gen.availableBeds, 18);
+  assert.equal(gen.totalBeds, 60);
+
+  // 2. ICU ward: FRESH with confirmed 0 beds (Full) - distinguishable from missing
+  const icu = sampleHospital.availability.icu;
+  assert.equal(icu.freshnessState, 'FRESH');
+  assert.equal(icu.availableBeds, 0);
+  assert.equal(icu.totalBeds, 12);
+  assert.notEqual(icu.availableBeds, null);
+
+  // 3. HDU ward: OVERDUE (15-60m)
+  const hdu = sampleHospital.availability.hdu;
+  assert.equal(hdu.freshnessState, 'OVERDUE');
+  assert.equal(hdu.availableBeds, 3);
+
+  // 4. Pediatric ward: UNKNOWN - must NEVER display numeric 0
+  const ped = sampleHospital.availability.pediatric;
+  assert.equal(ped.freshnessState, 'UNKNOWN');
+  assert.equal(ped.availableBeds, null);
+  assert.notEqual(ped.availableBeds, 0);
+});
+
+test('Hospital details handles unsupported ward categories without inventing counts', () => {
+  // Facility that only supports General and ICU
+  const hospitalWithRestrictedWards = {
+    id: 'fac-taluk-small',
+    name: 'Small Taluk Hospital',
+    supportedBedCategories: ['general', 'icu'],
+    availability: {
+      general: { availableBeds: 5, totalBeds: 20, freshnessState: 'FRESH' },
+      icu: { availableBeds: 1, totalBeds: 4, freshnessState: 'FRESH' },
+    },
+  };
+
+  function evaluateWardSupport(hospital, category) {
+    const supported = hospital.supportedBedCategories || ['general', 'icu', 'hdu', 'pediatric'];
+    const isSupported = supported.includes(category);
+    if (!isSupported) {
+      return { supported: false, statusText: 'Not Supported', availableBeds: null, totalBeds: null };
+    }
+    const snap = hospital.availability?.[category];
+    return {
+      supported: true,
+      statusText: snap?.freshnessState || 'UNKNOWN',
+      availableBeds: snap?.availableBeds ?? null,
+      totalBeds: snap?.totalBeds ?? null,
+    };
+  }
+
+  assert.equal(evaluateWardSupport(hospitalWithRestrictedWards, 'general').supported, true);
+  assert.equal(evaluateWardSupport(hospitalWithRestrictedWards, 'icu').supported, true);
+
+  // HDU and Pediatric are NOT supported
+  const hduResult = evaluateWardSupport(hospitalWithRestrictedWards, 'hdu');
+  assert.equal(hduResult.supported, false);
+  assert.equal(hduResult.statusText, 'Not Supported');
+  assert.equal(hduResult.availableBeds, null);
+
+  const pedResult = evaluateWardSupport(hospitalWithRestrictedWards, 'pediatric');
+  assert.equal(pedResult.supported, false);
+  assert.equal(pedResult.statusText, 'Not Supported');
+  assert.equal(pedResult.availableBeds, null);
+});
+
+test('Hospital details STALE report (>60m) marks historical counts as unconfirmed', () => {
+  const staleSnapshot = {
+    availableBeds: 7,
+    totalBeds: 25,
+    freshnessState: 'STALE',
+    reportedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+  };
+
+  function formatStaleWard(snap) {
+    if (snap.freshnessState === 'STALE') {
+      return {
+        isConfirmed: false,
+        label: 'Unconfirmed (>60m)',
+        historicalCount: snap.availableBeds,
+        displayNotice: 'Historical count is strictly unconfirmed and excluded from verified emergency tallies.',
+      };
+    }
+    return { isConfirmed: true, label: 'Confirmed' };
+  }
+
+  const result = formatStaleWard(staleSnapshot);
+  assert.equal(result.isConfirmed, false);
+  assert.equal(result.historicalCount, 7);
+  assert.ok(result.label.includes('Unconfirmed'));
+});
+

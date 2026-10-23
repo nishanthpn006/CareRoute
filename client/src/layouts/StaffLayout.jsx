@@ -57,35 +57,43 @@ export function StaffLayout() {
 
         {/* Sidebar Navigation */}
         <nav className="staff-sidebar-nav" aria-label="Staff Navigation">
+          <div className="staff-nav-section-title">CLINICAL OPERATIONS</div>
           <NavLink
             to="/staff"
             end
             className={({ isActive }) => `staff-nav-item ${isActive ? 'active' : ''}`}
           >
             <span className="staff-nav-icon">📊</span>
-            <span>Dashboard Overview</span>
+            <span>Dashboard</span>
           </NavLink>
           <NavLink
             to="/staff/reports"
             className={({ isActive }) => `staff-nav-item ${isActive ? 'active' : ''}`}
           >
             <span className="staff-nav-icon">📋</span>
-            <span>Availability Reports</span>
+            <span>Bed Availability</span>
           </NavLink>
           <NavLink
             to="/staff/facilities"
             className={({ isActive }) => `staff-nav-item ${isActive ? 'active' : ''}`}
           >
             <span className="staff-nav-icon">🏥</span>
-            <span>Facility Management</span>
+            <span>Facilities</span>
           </NavLink>
-          <NavLink
-            to="/staff/verification"
-            className={({ isActive }) => `staff-nav-item ${isActive ? 'active' : ''}`}
-          >
-            <span className="staff-nav-icon">🛡️</span>
-            <span>Verification & Audit</span>
-          </NavLink>
+
+          {/* Verification & Audit - only shown where appropriate for user's role */}
+          {(role === 'platform_verifier' || role === 'security_admin') && (
+            <>
+              <div className="staff-nav-section-title">GOVERNANCE & AUDIT</div>
+              <NavLink
+                to="/staff/verification"
+                className={({ isActive }) => `staff-nav-item ${isActive ? 'active' : ''}`}
+              >
+                <span className="staff-nav-icon">🛡️</span>
+                <span>Verification & Audit</span>
+              </NavLink>
+            </>
+          )}
         </nav>
 
         {/* Sidebar Footer Actions */}
@@ -143,29 +151,31 @@ export function StaffLayout() {
                 className={({ isActive }) => `staff-mobile-nav-link ${isActive ? 'active' : ''}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Dashboard Overview
+                Dashboard
               </NavLink>
               <NavLink
                 to="/staff/reports"
                 className={({ isActive }) => `staff-mobile-nav-link ${isActive ? 'active' : ''}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Availability Reports
+                Bed Availability
               </NavLink>
               <NavLink
                 to="/staff/facilities"
                 className={({ isActive }) => `staff-mobile-nav-link ${isActive ? 'active' : ''}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Facility Management
+                Facilities
               </NavLink>
-              <NavLink
-                to="/staff/verification"
-                className={({ isActive }) => `staff-mobile-nav-link ${isActive ? 'active' : ''}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Verification & Audit
-              </NavLink>
+              {(role === 'platform_verifier' || role === 'security_admin') && (
+                <NavLink
+                  to="/staff/verification"
+                  className={({ isActive }) => `staff-mobile-nav-link ${isActive ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Verification & Audit
+                </NavLink>
+              )}
               <hr className="mobile-nav-divider" />
               <Link
                 to="/find-hospitals"

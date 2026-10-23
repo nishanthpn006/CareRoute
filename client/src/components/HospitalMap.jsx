@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, ZoomControl, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MAP_CONFIG } from '../services/mapConfig.js';
 import { isValidCoordinate } from '../services/routing.js';
@@ -53,23 +53,37 @@ function createUserIcon() {
 /**
  * Controller hook component to synchronize map bounds, centers and resize events.
  */
-function MapViewController({ hospitals, selectedHospital, userLocation, activeRoute }) {
+function MapViewController({ hospitals, selectedHospital, userLocation, activeRoute, mapViewMode }) {
   const map = useMap();
 
-  // Invalidate map size on initial render or resize to prevent gray missing tiles
+  // Invalidate map size on initial render, view-mode change, or container resize to prevent grey missing tiles
   useEffect(() => {
+    map.invalidateSize();
     const timer = setTimeout(() => {
       map.invalidateSize();
-    }, 250);
+    }, 150);
+
+    const container = map.getContainer();
+    let resizeObserver = null;
+
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      resizeObserver.observe(container);
+    }
 
     const onResize = () => map.invalidateSize();
     window.addEventListener('resize', onResize);
 
     return () => {
       clearTimeout(timer);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       window.removeEventListener('resize', onResize);
     };
-  }, [map]);
+  }, [map, mapViewMode]);
 
   // Adjust view when route, selection, or hospital list updates
   useEffect(() => {
@@ -112,6 +126,10 @@ export function HospitalMap({
   routingBusy = false,
   onClearRoute,
   selectedBed = 'all',
+  mapViewMode = 'both',
+  onLocateMe = null,
+  locationMessage = '',
+  locationBusy = false,
 }) {
   const validHospitals = useMemo(() => {
     return hospitals.filter((h) => isValidCoordinate(h));
@@ -124,9 +142,12 @@ export function HospitalMap({
       <MapContainer
         center={MAP_CONFIG.defaultCenter}
         zoom={MAP_CONFIG.defaultZoom}
+        zoomControl={false}
         scrollWheelZoom={true}
         className="leaflet-hospital-map"
       >
+        <ZoomControl position="topright" />
+
         <TileLayer
           url={MAP_CONFIG.tileUrl}
           attribution={MAP_CONFIG.tileAttribution}
@@ -138,6 +159,7 @@ export function HospitalMap({
           selectedHospital={selectedHospital}
           userLocation={userLocation}
           activeRoute={activeRoute}
+          mapViewMode={mapViewMode}
         />
 
         {/* User location pin */}
@@ -264,11 +286,11 @@ export function HospitalMap({
 
       {/* Floating Routing & Route Info Card */}
       {selectedHospital && (
-        <div className="route-info-card" role="region" aria-label="Route summary">
+        <div className="route-info-card" role="region" aria-label="Selected destination and route summary">
           <div className="route-card-header">
             <div>
               <span className="route-tag">Selected Destination</span>
-              <h4>{selectedHospital.name}</h4>
+              <h4 className="route-hospital-name">{selectedHospital.name}</h4>
               <p className="route-locality">{selectedHospital.locality || selectedHospital.city}</p>
             </div>
             {onClearRoute && (
@@ -324,7 +346,24 @@ export function HospitalMap({
 
           {!userLocation && (
             <div className="route-location-prompt">
-              <p>📍 Enable device location to view driving directions and road route on the map.</p>
+              <p className="route-prompt-text">
+                📍 Enable device location to view driving directions and road route on the map.
+              </p>
+              {onLocateMe && (
+                <button
+                  type="button"
+                  className="route-locate-btn"
+                  onClick={onLocateMe}
+                  disabled={locationBusy}
+                >
+                  {locationBusy ? 'Locating…' : '📍 Use My Location'}
+                </button>
+              )}
+              {locationMessage && (
+                <p className="route-location-msg" role="status">
+                  {locationMessage}
+                </p>
+              )}
             </div>
           )}
         </div>

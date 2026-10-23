@@ -21,20 +21,20 @@ export function EmergencyPage() {
 
         {/* Primary and Secondary Call Cards */}
         <div className="emergency-cards-container">
-          {/* Development Test Action (when VITE_SOS_TEST_NUMBER is active in dev mode) */}
+          {/* Development Test Action (when active in dev mode) */}
           {sosAction.isOverrideActive && (
             <a
               href={sosAction.telLink}
               className="sos-call-card sos-test-card emergency-page-card"
               id="emergency-page-call-test"
-              aria-label="Test Call — Personal Number"
+              aria-label="Test call (development only)"
             >
               <div className="sos-card-content">
                 <span className="sos-icon-circle sos-test-icon">🧪</span>
                 <div className="sos-text">
-                  <span className="sos-number">Test Call — Personal Number</span>
-                  <span className="sos-label">Development Test Override (VITE_SOS_TEST_NUMBER)</span>
-                  <span className="sos-desc">Connects to your configured personal phone to test device telephony handling</span>
+                  <span className="sos-number">Test Call</span>
+                  <span className="sos-label">Test call (development only)</span>
+                  <span className="sos-desc">Opens configured test dialler to verify device telephony handling</span>
                 </div>
               </div>
               <span className="emergency-call-cta">Test Call ↗</span>
@@ -90,10 +90,10 @@ export function EmergencyPage() {
       {/* Desktop Browser Dialer Guidance */}
       <section className="sos-desktop-notice emergency-desktop-box">
         <span className="sos-info-icon" aria-hidden="true">ℹ️</span>
-        <div>
+        <div className="sos-desktop-notice-text">
           <strong>Calling from a desktop computer or laptop?</strong>
           <p>
-            If your browser lacks a telephony handler (e.g. Windows PC or Mac), pick up your mobile phone and dial <strong>112</strong> or <strong>108</strong> directly on your telephone keypad.
+            If your browser lacks a telephony handler, dial <span className="sos-dial-highlight">112</span> or <span className="sos-dial-highlight">108</span> directly on your mobile keypad.
           </p>
         </div>
       </section>

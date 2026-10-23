@@ -144,4 +144,131 @@ test('authorization and tenant isolation tests', async (t) => {
     const body = await res.json();
     assert.ok(body.error.includes('inactive or suspended'));
   });
+
+  await t.test('facility_reporter can GET availability reports for assigned facility', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/availability-reports`, {
+      headers: { Authorization: `Bearer ${reporterToken}` },
+    });
+
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.ok(Array.isArray(body.data));
+    assert.equal(body.meta.facilityId, 'fac-trichy-mgmgh');
+  });
+
+  await t.test('facility_reporter receives 403 when attempting IDOR to GET availability reports for unassigned facility', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-apollo/availability-reports`, {
+      headers: { Authorization: `Bearer ${reporterToken}` },
+    });
+
+    assert.equal(res.status, 403);
+    const body = await res.json();
+    assert.ok(body.error.includes('Forbidden'));
+    assert.ok(body.error.includes('not authorized to report availability for this facility'));
+  });
+
+  await t.test('organization_admin can GET availability reports for their organization facility', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-apollo/availability-reports`, {
+      headers: { Authorization: `Bearer ${apolloAdminToken}` },
+    });
+
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.ok(Array.isArray(body.data));
+    assert.equal(body.meta.facilityId, 'fac-trichy-apollo');
+  });
+
+  await t.test('organization_admin receives 403 when attempting to GET reports for cross-organization facility', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/availability-reports`, {
+      headers: { Authorization: `Bearer ${apolloAdminToken}` },
+    });
+
+    assert.equal(res.status, 403);
+    const body = await res.json();
+    assert.ok(body.error.includes('Forbidden'));
+    assert.ok(body.error.includes('another organization'));
+  });
+
+  await t.test('platform_verifier receives 403 when attempting to GET clinical availability reports', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/availability-reports`, {
+      headers: { Authorization: `Bearer ${verifierToken}` },
+    });
+
+    assert.equal(res.status, 403);
+    const body = await res.json();
+    assert.ok(body.error.includes('Forbidden'));
+  });
+
+  await t.test('facility_reporter can GET /current for assigned facility with evaluated freshness', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/current`, {
+      headers: { Authorization: `Bearer ${reporterToken}` },
+    });
+
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.ok(body.data);
+    assert.equal(body.facility.id, 'fac-trichy-mgmgh');
+  });
+
+  await t.test('facility_reporter receives 403 when attempting IDOR to GET /current for unassigned facility', async () => {
+    const res = await fetch(`${baseUrl}/facilities/fac-trichy-apollo/current`, {
+      headers: { Authorization: `Bearer ${reporterToken}` },
+    });
+
+    assert.equal(res.status, 403);
+    const body = await res.json();
+    assert.ok(body.error.includes('Forbidden'));
+  });
+
+  await t.test('capacity reporting flow: report 22 / 50 beds, verify persistence, read-back, and freshness', async () => {
+    // 1. Submit report for General Ward: 22 available / 50 total
+    const postRes = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/availability-reports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${reporterToken}`,
+      },
+      body: JSON.stringify({
+        category: 'general',
+        availableBeds: 22,
+        totalBeds: 50,
+        source: 'staff_portal_web',
+      }),
+    });
+
+    assert.equal(postRes.status, 201);
+    const postBody = await postRes.json();
+    assert.equal(postBody.data.report.category, 'general');
+    assert.equal(postBody.data.report.availableBeds, 22);
+    assert.equal(postBody.data.report.totalBeds, 50);
+    assert.equal(postBody.data.snapshot.freshnessState, 'FRESH');
+
+    // 2. Read back from /current endpoint
+    const currentRes = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/current`, {
+      headers: { Authorization: `Bearer ${reporterToken}` },
+    });
+
+    assert.equal(currentRes.status, 200);
+    const currentBody = await currentRes.json();
+    const generalSnap = currentBody.data.general;
+    assert.ok(generalSnap);
+    assert.equal(generalSnap.availableBeds, 22);
+    assert.equal(generalSnap.totalBeds, 50);
+    assert.equal(generalSnap.freshnessState, 'FRESH');
+
+    // 3. Other categories remain independent
+    const icuSnap = currentBody.data.icu;
+    assert.ok(!icuSnap || icuSnap.freshnessState === 'UNKNOWN');
+
+    // 4. Read back history
+    const historyRes = await fetch(`${baseUrl}/facilities/fac-trichy-mgmgh/availability-reports?category=general`, {
+      headers: { Authorization: `Bearer ${reporterToken}` },
+    });
+    assert.equal(historyRes.status, 200);
+    const historyBody = await historyRes.json();
+    assert.ok(historyBody.data.length >= 1);
+    assert.equal(historyBody.data[0].category, 'general');
+    assert.equal(historyBody.data[0].availableBeds, 22);
+    assert.equal(historyBody.data[0].totalBeds, 50);
+  });
 });

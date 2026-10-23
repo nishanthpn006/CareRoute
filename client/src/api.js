@@ -1,6 +1,9 @@
 import { firebaseAuth } from './firebase.js';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000').replace(/\/$/, '');
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = (rawBaseUrl && rawBaseUrl !== 'http://localhost:4000' && rawBaseUrl !== 'http://127.0.0.1:4000')
+  ? rawBaseUrl.replace(/\/$/, '')
+  : '';
 let sessionToken = localStorage.getItem('careroute_session_token') || '';
 
 export function setSessionToken(token) {

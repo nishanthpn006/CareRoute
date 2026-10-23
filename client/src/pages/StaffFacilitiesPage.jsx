@@ -125,11 +125,11 @@ export function StaffFacilitiesPage() {
 
       {/* Role restriction notice for non-admin staff */}
       {!isOrgAdmin && (
-        <div className="info-notice">
-          <span className="notice-icon" aria-hidden="true">i</span>
+        <div className="role-restricted-notice" style={{ margin: '0 0 4px' }}>
+          <span className="notice-icon" aria-hidden="true" style={{ fontSize: '18px', flexShrink: 0 }}>ℹ</span>
           <div>
             <strong>Reporting Role Active:</strong>
-            <p>
+            <p style={{ margin: '4px 0 0' }}>
               Your current account has <strong>facility_reporter</strong> privileges. You can inspect facility profiles and submit bed availability reports. Facility registration and deactivation require <strong>organization_admin</strong> privileges.
             </p>
           </div>
@@ -138,16 +138,19 @@ export function StaffFacilitiesPage() {
 
       {/* Facility Registration Form (Organization Admin only) */}
       {isOrgAdmin && (
-        <section className="staff-form-card">
-          <h2>Register Facility Draft</h2>
-          <p className="muted form-subtitle">
-            Draft facilities are isolated to your organization and require Platform Verifier review before public directory publication.
-          </p>
+        <section className="staff-form-panel">
+          <div className="form-panel-header">
+            <h2>Register Facility Draft</h2>
+            <p className="muted form-subtitle">
+              Draft facilities are isolated to your organization and require Platform Verifier review before public directory publication.
+            </p>
+          </div>
 
-          <form onSubmit={handleCreateFacility} className="facility-create-form">
-            <div className="form-grid">
-              <label>
-                <span>Facility Name</span>
+          <form onSubmit={handleCreateFacility} className="facility-registration-form">
+            <div className="facility-form-grid">
+              {/* Row 1: Facility Name | Phone / Contact */}
+              <label className="form-field-group">
+                <span className="field-label">Facility Name</span>
                 <input
                   type="text"
                   required
@@ -155,11 +158,12 @@ export function StaffFacilitiesPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Srirangam Government Hospital"
                   disabled={busy}
+                  className="form-control-input"
                 />
               </label>
 
-              <label>
-                <span>Phone / Contact</span>
+              <label className="form-field-group">
+                <span className="field-label">Phone / Contact</span>
                 <input
                   type="text"
                   required
@@ -167,11 +171,13 @@ export function StaffFacilitiesPage() {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="0431-2460123"
                   disabled={busy}
+                  className="form-control-input"
                 />
               </label>
 
-              <label className="field-wide">
-                <span>Street Address</span>
+              {/* Row 2: Street Address spanning both columns */}
+              <label className="form-field-group field-span-2">
+                <span className="field-label">Street Address</span>
                 <input
                   type="text"
                   required
@@ -179,55 +185,67 @@ export function StaffFacilitiesPage() {
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Street name, locality"
                   disabled={busy}
+                  className="form-control-input"
                 />
               </label>
 
-              <label>
-                <span>City / District</span>
+              {/* Row 3: City / District | Coordinates */}
+              <label className="form-field-group">
+                <span className="field-label">City / District</span>
                 <input
                   type="text"
                   required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   disabled={busy}
+                  className="form-control-input"
                 />
               </label>
 
-              <label>
-                <span>Coordinates (Latitude, Longitude)</span>
-                <div className="coords-input-group">
+              <div className="form-field-group">
+                <span className="field-label">Coordinates (Latitude, Longitude)</span>
+                <div className="coords-dual-grid">
                   <input
                     type="number"
                     step="any"
+                    required
                     value={latitude}
                     onChange={(e) => setLatitude(e.target.value)}
-                    placeholder="Lat"
+                    placeholder="Latitude (e.g. 10.8050)"
                     disabled={busy}
+                    aria-label="Latitude coordinate"
+                    className="form-control-input"
                   />
                   <input
                     type="number"
                     step="any"
+                    required
                     value={longitude}
                     onChange={(e) => setLongitude(e.target.value)}
-                    placeholder="Lng"
+                    placeholder="Longitude (e.g. 78.6856)"
                     disabled={busy}
+                    aria-label="Longitude coordinate"
+                    className="form-control-input"
                   />
                 </div>
-              </label>
+              </div>
 
-              <label className="field-wide">
-                <span>Clinical Capabilities (comma-separated)</span>
+              {/* Row 4: Clinical Capabilities spanning both columns */}
+              <label className="form-field-group field-span-2">
+                <span className="field-label">Clinical Capabilities (comma-separated)</span>
                 <input
                   type="text"
                   value={services}
                   onChange={(e) => setServices(e.target.value)}
+                  placeholder="Emergency, ICU, Trauma Care"
                   disabled={busy}
+                  className="form-control-input"
                 />
               </label>
             </div>
 
-            <div className="form-submit-row">
-              <button type="submit" className="button button-primary" disabled={busy}>
+            <div className="facility-form-actions">
+              <button type="submit" className="button button-primary submit-facility-btn" disabled={busy}>
                 {busy ? 'Registering Draft…' : 'Register Draft Facility'}
               </button>
             </div>
@@ -237,7 +255,10 @@ export function StaffFacilitiesPage() {
 
       {/* Facilities List */}
       <section className="staff-facilities-list-section">
-        <h2>Facilities within Organization Scope</h2>
+        <div className="section-heading">
+          <h2>Facilities within Organization Scope</h2>
+          <span className="result-count">{facilities.length} {facilities.length === 1 ? 'facility' : 'facilities'}</span>
+        </div>
         {loading ? (
           <div className="loading-state"><span className="loader" /> Loading facilities…</div>
         ) : facilities.length === 0 ? (
@@ -249,18 +270,38 @@ export function StaffFacilitiesPage() {
             {facilities.map((facility) => (
               <div key={facility.id} className="staff-facility-card">
                 <div className="facility-card-header">
-                  <div>
-                    <h3>{facility.name}</h3>
-                    <p className="muted">{facility.address}, {facility.city}</p>
+                  <div className="facility-card-title-group">
+                    <div className="facility-card-avatar" aria-hidden="true">
+                      {facility.name?.[0]?.toUpperCase() || 'H'}
+                    </div>
+                    <div>
+                      <h3 className="facility-card-name">{facility.name}</h3>
+                      <p className="facility-card-address">
+                        {facility.address}, {facility.city || facility.district || 'Tiruchirappalli'}
+                      </p>
+                    </div>
                   </div>
-                  <span className={`status ${facility.operatingStatus === 'open' ? 'status-open' : 'status-closed'}`}>
-                    {facility.operatingStatus === 'open' ? 'Active' : 'Closed'}
+                  <span className={`status-pill ${facility.operatingStatus === 'open' ? 'status-open' : 'status-closed'}`}>
+                    <span className="status-dot" />
+                    {facility.operatingStatus === 'open' ? 'Open' : 'Closed'}
                   </span>
                 </div>
 
                 <div className="facility-card-meta">
-                  <div className="meta-pill">Phone: {facility.phone || 'N/A'}</div>
-                  <div className="meta-pill">Status: {facility.verificationStatus || 'Verified'}</div>
+                  <div className="facility-meta-chip">
+                    <span className="meta-chip-label">Phone:</span>
+                    <strong>{facility.phone || 'Not listed'}</strong>
+                  </div>
+                  <div className="facility-meta-chip">
+                    <span className="meta-chip-label">Verification:</span>
+                    <span className={`verification-pill verification-pill-${(facility.verificationStatus || 'unverified').toLowerCase()}`}>
+                      {facility.verificationStatus === 'verified'
+                        ? '✓ Verified'
+                        : facility.verificationStatus === 'pending'
+                        ? '⏳ Pending Review'
+                        : (facility.verificationStatus || 'Unverified')}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="facility-card-actions">
@@ -268,12 +309,12 @@ export function StaffFacilitiesPage() {
                     to={`/staff/reports?facilityId=${facility.id}`}
                     className="button button-primary button-sm"
                   >
-                    Report Bed Capacity
+                    Report Bed Capacity →
                   </Link>
                   {isOrgAdmin && (
                     <button
                       type="button"
-                      className="button button-quiet button-sm danger-text"
+                      className="button button-outline button-sm danger-btn"
                       onClick={() => handleDeactivate(facility)}
                       disabled={busy}
                     >

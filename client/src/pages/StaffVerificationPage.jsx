@@ -96,18 +96,18 @@ export function StaffVerificationPage() {
           </div>
         </div>
 
-        <div className="demo-notice verifier-restricted-notice">
-          <span className="notice-icon" aria-hidden="true">🛡️</span>
+        <div className="role-restricted-notice verifier-restricted-notice" style={{ margin: '0 0 20px' }}>
+          <span className="notice-icon" aria-hidden="true" style={{ fontSize: '20px', flexShrink: 0 }}>🛡️</span>
           <div>
             <strong>Role-Restricted Platform Workflow:</strong>
-            <p>
+            <p style={{ margin: '6px 0' }}>
               Facility publication verification and platform-wide audit review are strictly restricted to <strong>platform_verifier</strong> and <strong>security_admin</strong> roles to maintain strict separation of duties.
             </p>
-            <p>
+            <p style={{ margin: '0 0 12px' }}>
               Your current account (<strong>{email}</strong>) has the <strong>{role}</strong> role.
             </p>
             <div className="restricted-actions">
-              <p>To test the verification workflow in this demo environment, sign in with the platform verifier account:</p>
+              <p style={{ margin: '0 0 8px', fontSize: '12px', color: 'var(--muted)' }}>To test the verification workflow in this demo environment, sign in with the platform verifier account:</p>
               <Link to="/staff/login" className="button button-outline button-sm">
                 Switch to Verifier Account (verifier@careroute.local)
               </Link>
@@ -125,7 +125,7 @@ export function StaffVerificationPage() {
           <span className="eyebrow">Platform Governance</span>
           <h1>Facility Verification & Audit Review</h1>
           <p className="muted">
-            Independent reviewer workspace. Review facility drafts and inspect platform-wide mutation logs.
+            Independent reviewer workspace. Review facility drafts and inspect platform mutation audit events.
           </p>
         </div>
         <button type="button" className="button button-outline" onClick={loadAuditEvents} disabled={loading}>
@@ -137,12 +137,17 @@ export function StaffVerificationPage() {
       {successMsg && <div className="success-box" role="status">{successMsg}</div>}
 
       {/* Decision Form */}
-      <section className="staff-form-card">
-        <h2>Submit Verification Decision</h2>
-        <form onSubmit={handleVerificationSubmit} className="verification-form">
-          <div className="form-grid">
-            <label>
-              <span>Target Facility ID</span>
+      <section className="staff-form-panel">
+        <div className="form-panel-header">
+          <h2>Submit Verification Decision</h2>
+          <p className="muted form-subtitle">
+            Record independent governance decisions for hospital facility listings and directory publication.
+          </p>
+        </div>
+        <form onSubmit={handleVerificationSubmit} className="facility-registration-form">
+          <div className="staff-form-grid">
+            <label className="form-field-group">
+              <span className="field-label">Target Facility ID</span>
               <input
                 type="text"
                 required
@@ -150,15 +155,17 @@ export function StaffVerificationPage() {
                 onChange={(e) => setFacilityId(e.target.value)}
                 placeholder="e.g. fac-apollo-trichy"
                 disabled={verificationBusy}
+                className="form-control-input"
               />
             </label>
 
-            <label>
-              <span>Verification Status</span>
+            <label className="form-field-group">
+              <span className="field-label">Verification Status</span>
               <select
                 value={verificationStatus}
                 onChange={(e) => setVerificationStatus(e.target.value)}
                 disabled={verificationBusy}
+                className="form-control-input"
               >
                 <option value="verified">Verified (Approved)</option>
                 <option value="pending">Pending Review</option>
@@ -166,12 +173,13 @@ export function StaffVerificationPage() {
               </select>
             </label>
 
-            <label>
-              <span>Publication Status</span>
+            <label className="form-field-group">
+              <span className="field-label">Publication Status</span>
               <select
                 value={publicationStatus}
                 onChange={(e) => setPublicationStatus(e.target.value)}
                 disabled={verificationBusy}
+                className="form-control-input"
               >
                 <option value="published">Published to Public Directory</option>
                 <option value="draft">Draft (Restricted to Org)</option>
@@ -179,20 +187,21 @@ export function StaffVerificationPage() {
               </select>
             </label>
 
-            <label className="field-wide">
-              <span>Verifier Decision Notes</span>
+            <label className="form-field-group field-span-2">
+              <span className="field-label">Verifier Decision Notes</span>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Official source reference or review rationale"
                 disabled={verificationBusy}
+                className="form-control-input"
               />
             </label>
           </div>
 
-          <div className="form-submit-row">
-            <button type="submit" className="button button-primary" disabled={verificationBusy || !facilityId}>
+          <div className="facility-form-actions">
+            <button type="submit" className="button button-primary submit-facility-btn" disabled={verificationBusy || !facilityId}>
               {verificationBusy ? 'Submitting…' : 'Record Verification Decision'}
             </button>
           </div>
@@ -202,7 +211,7 @@ export function StaffVerificationPage() {
       {/* System Audit Events Table */}
       <section className="staff-history-section">
         <div className="section-heading">
-          <h2>Immutable System Audit Log</h2>
+          <h2>Platform Audit Trail</h2>
           <span className="result-count">{auditEvents.length} events loaded</span>
         </div>
 
@@ -232,7 +241,8 @@ export function StaffVerificationPage() {
                     <td><span className="table-source">{ev.actorUid || ev.actorEmail || 'system'}</span></td>
                     <td>{ev.facilityId || 'N/A'}</td>
                     <td>
-                      <span className={ev.status === 'success' || !ev.status ? 'status-open' : 'status-closed'}>
+                      <span className={`status-pill ${ev.status === 'success' || !ev.status ? 'status-open' : 'status-closed'}`}>
+                        <span className="status-dot" />
                         {ev.status || 'logged'}
                       </span>
                     </td>
