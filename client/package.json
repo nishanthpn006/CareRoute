@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --test src/utils/distance.test.js src/services/routing.test.js src/utils/availability.test.js src/pages/routing.test.js src/utils/sos.test.js"
+    "test": "node --test src/utils/distance.test.js src/services/routing.test.js src/utils/availability.test.js src/pages/routing.test.js src/utils/sos.test.js src/context/theme.test.js"
   },
   "dependencies": {
     "firebase": "^12.19.0",

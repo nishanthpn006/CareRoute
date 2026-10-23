@@ -2,18 +2,24 @@
 
 :root {
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
   color: #0f172a;
   background: #f8fafc;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-  /* Clinical Design System Tokens */
+  /* Clinical Design System Tokens (Light Theme) */
+  --bg: #f8fafc;
+  --bg-subtle: #f1f5f9;
   --ink: #0f172a;
   --ink-secondary: #334155;
   --muted: #64748b;
   --muted-light: #94a3b8;
   --surface: #ffffff;
   --surface-subtle: #f1f5f9;
+  --surface-raised: #ffffff;
+  --surface-card: #ffffff;
+  --surface-overlay: rgba(255, 255, 255, 0.96);
   --line: #e2e8f0;
   --line-strong: #cbd5e1;
 
@@ -32,6 +38,34 @@
   --emergency-light: #fef2f2;
   --emergency-border: #fecaca;
   --emergency-pulse: rgba(220, 38, 38, 0.35);
+
+  /* Status Colors */
+  --status-open-bg: #ecfdf5;
+  --status-open-text: #065f46;
+  --status-open-border: #a7f3d0;
+  --status-closed-bg: #fef2f2;
+  --status-closed-text: #991b1b;
+  --status-closed-border: #fecaca;
+
+  /* Freshness Colors */
+  --fresh-bg: #ecfdf5;
+  --fresh-text: #065f46;
+  --fresh-border: #a7f3d0;
+  --overdue-bg: #fffbeb;
+  --overdue-text: #92400e;
+  --overdue-border: #fde68a;
+  --stale-bg: #fef2f2;
+  --stale-text: #991b1b;
+  --stale-border: #fecaca;
+  --unknown-bg: #f1f5f9;
+  --unknown-text: #475569;
+  --unknown-border: #cbd5e1;
+
+  /* Notice and Prototype Disclaimer Tokens */
+  --notice-warn-bg: #fefce8;
+  --notice-warn-border: #fde68a;
+  --notice-warn-text: #854d0e;
+  --notice-warn-p: #a16207;
 
   /* Coherent Typography System Tokens */
   --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -62,6 +96,79 @@
   --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
 }
 
+/* ==========================================================================
+   Clinical Dark Theme Design Tokens ([data-theme="dark"])
+   ========================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+  color: #f1f5f9;
+  background: #111827;
+
+  /* Clinical Design System Tokens (Dark Theme Specification) */
+  --bg: #111827;
+  --bg-subtle: #0f172a;
+  --ink: #f1f5f9;
+  --ink-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --muted-light: #64748b;
+  --surface: #1f2937;
+  --surface-subtle: #1e293b;
+  --surface-raised: #273449;
+  --surface-card: #1f2937;
+  --surface-overlay: rgba(31, 41, 55, 0.95);
+  --line: #374151;
+  --line-strong: #4b5563;
+
+  /* Clinical Teal / Blue Accents (Targeting WCAG 2.2 AA Contrast) */
+  --teal: #2dd4bf;
+  --teal-dark: #14b8a6;
+  --teal-light: rgba(45, 212, 191, 0.14);
+  --teal-border: rgba(45, 212, 191, 0.4);
+  --blue: #38bdf8;
+  --blue-light: rgba(56, 189, 248, 0.14);
+  --blue-border: rgba(56, 189, 248, 0.4);
+
+  /* Dedicated Emergency Red / Coral Accents */
+  --emergency-red: #f87171;
+  --emergency-dark: #ef4444;
+  --emergency-light: rgba(239, 68, 68, 0.18);
+  --emergency-border: rgba(248, 113, 113, 0.45);
+  --emergency-pulse: rgba(239, 68, 68, 0.45);
+
+  /* Status Colors in Dark Mode */
+  --status-open-bg: rgba(16, 185, 129, 0.16);
+  --status-open-text: #6ee7b7;
+  --status-open-border: rgba(16, 185, 129, 0.35);
+  --status-closed-bg: rgba(239, 68, 68, 0.16);
+  --status-closed-text: #fca5a5;
+  --status-closed-border: rgba(239, 68, 68, 0.35);
+
+  /* Freshness Colors in Dark Mode */
+  --fresh-bg: rgba(16, 185, 129, 0.16);
+  --fresh-text: #6ee7b7;
+  --fresh-border: rgba(16, 185, 129, 0.35);
+  --overdue-bg: rgba(245, 158, 11, 0.16);
+  --overdue-text: #fde68a;
+  --overdue-border: rgba(245, 158, 11, 0.35);
+  --stale-bg: rgba(239, 68, 68, 0.16);
+  --stale-text: #fca5a5;
+  --stale-border: rgba(239, 68, 68, 0.35);
+  --unknown-bg: rgba(148, 163, 184, 0.14);
+  --unknown-text: #cbd5e1;
+  --unknown-border: rgba(148, 163, 184, 0.3);
+
+  /* Notice and Prototype Disclaimer Tokens in Dark Mode */
+  --notice-warn-bg: rgba(245, 158, 11, 0.12);
+  --notice-warn-border: rgba(245, 158, 11, 0.35);
+  --notice-warn-text: #fde68a;
+  --notice-warn-p: #fef3c7;
+
+  /* Elevation and Shadows for Dark Mode */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.65);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -70,10 +177,17 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--bg);
   color: var(--ink);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none !important;
+  }
 }
 
 button, input, select {
@@ -147,7 +261,7 @@ a {
 }
 
 .button-outline {
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink-secondary);
   border-color: var(--line-strong);
 }
@@ -180,7 +294,7 @@ a {
    ========================================================================== */
 .topbar {
   height: 68px;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface-overlay);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
@@ -244,6 +358,126 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* ==========================================================================
+   Accessible Light / Dark Theme Toggle
+   ========================================================================== */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface-subtle);
+  color: var(--ink);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.theme-toggle-slider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.18s ease;
+}
+
+.theme-toggle-light .theme-toggle-slider {
+  color: #d97706; /* warm clinical amber for sun */
+}
+
+.theme-toggle-dark .theme-toggle-slider {
+  color: #38bdf8; /* luminous cyan for moon */
+}
+
+.theme-icon {
+  display: block;
+}
+
+/* Staff Sidebar Toggle Variant */
+.staff-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.staff-theme-toggle:hover {
+  background: var(--surface);
+  border-color: var(--teal);
+}
+
+.staff-theme-toggle:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.staff-theme-toggle .theme-toggle-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile Drawer Variant */
+.mobile-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  transition: background 0.12s;
+}
+
+.mobile-theme-toggle:hover {
+  background: var(--teal-light);
+  color: var(--teal-dark);
+}
+
+.mobile-theme-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.staff-mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .location-header-btn {
@@ -422,9 +656,9 @@ a {
 .verified-badge {
   font-size: var(--text-xs);
   font-weight: 600;
-  color: #065f46;
-  background: #d1fae5;
-  border: 1px solid #a7f3d0;
+  color: var(--status-open-text);
+  background: var(--status-open-bg);
+  border: 1px solid var(--status-open-border);
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -530,11 +764,11 @@ a {
 /* ==========================================================================
    Notices & Safety Disclosures
    ========================================================================== */
-.demo-notice, .info-notice {
-  border: 1px solid #fde68a;
+.demo-notice {
+  border: 1px solid var(--notice-warn-border);
   border-radius: var(--radius-md);
-  background: #fefce8;
-  color: #854d0e;
+  background: var(--notice-warn-bg);
+  color: var(--notice-warn-text);
   padding: 10px 14px;
   display: flex;
   gap: 10px;
@@ -544,19 +778,28 @@ a {
   line-height: 1.5;
 }
 
-.demo-notice p, .info-notice p {
+.demo-notice p {
   margin: 2px 0 0;
-  color: #a16207;
+  color: var(--notice-warn-p);
 }
 
 .info-notice {
-  border-color: var(--teal-border);
+  border: 1px solid var(--teal-border);
+  border-radius: var(--radius-md);
   background: var(--teal-light);
   color: var(--teal-dark);
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .info-notice p {
-  color: #115e59;
+  margin: 2px 0 0;
+  color: var(--teal-dark);
 }
 
 .notice-icon {
@@ -698,7 +941,7 @@ a {
   padding: 0 34px 0 38px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   font-size: 13px;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -783,7 +1026,7 @@ a {
   padding: 0 10px;
   font-size: 12px;
   color: var(--ink);
-  background: #ffffff;
+  background: var(--surface);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -894,7 +1137,7 @@ a {
 }
 
 .view-mode-btn.active {
-  background: #ffffff;
+  background: var(--surface);
   color: var(--teal-dark);
   box-shadow: var(--shadow-sm);
 }
@@ -1080,7 +1323,7 @@ a {
    Redesigned Hospital Card with Focal Bed Availability Hierarchy
    ========================================================================== */
 .hospital-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-left: 3px solid transparent;
   border-radius: var(--radius-sm);
@@ -1283,8 +1526,8 @@ a {
    Redesigned Bed Availability Section (Primary Visual Focal Point)
    ========================================================================== */
 .card-bed-availability {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   display: flex;
@@ -1330,7 +1573,7 @@ a {
 
 /* Focal Aggregate Card */
 .bed-aggregate-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid #cbd5e1;
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -1463,8 +1706,8 @@ a {
 
 /* Unreported Notice Card */
 .bed-unreported-card {
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
+  background: var(--surface-subtle);
+  border: 1px dashed var(--line);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   box-sizing: border-box;
@@ -1522,9 +1765,9 @@ a {
 }
 
 .ward-card-tile {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0;
-  border-left: 3px solid #cbd5e1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
   border-radius: var(--radius-sm);
   padding: 8px 10px;
   display: flex;
@@ -1538,32 +1781,32 @@ a {
 }
 
 .ward-card-tile.bed-stat-fresh {
-  background: #ffffff !important;
+  background: var(--surface);
   border-left-color: var(--teal);
   color: var(--ink);
 }
 
 .ward-card-tile.bed-stat-overdue {
-  background: #ffffff !important;
+  background: var(--surface);
   border-left-color: #f59e0b;
   color: var(--ink);
 }
 
 .ward-card-tile.bed-stat-stale {
-  background: #fffcf9 !important;
+  background: var(--surface);
   border-left-color: #ea580c;
   color: var(--ink);
 }
 
 .ward-card-tile.bed-stat-unknown {
-  background: #f8fafc !important;
-  border-left-color: #cbd5e1;
+  background: var(--surface-subtle);
+  border-left-color: var(--line-strong);
   color: var(--ink);
 }
 
 .ward-card-tile.ward-tile-selected {
   border-color: var(--teal);
-  background: #f0fdfa !important;
+  background: var(--teal-light);
 }
 
 .ward-tile-header {
@@ -2225,7 +2468,7 @@ a {
 
 /* Persistent Header Card */
 .detail-header-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 24px 28px;
@@ -2378,7 +2621,7 @@ a {
 }
 
 .detail-tab-btn:hover:not(.active) {
-  background: #ffffff;
+  background: var(--surface-raised);
   color: var(--ink);
   border-color: #94a3b8 #94a3b8 transparent;
 }
@@ -2390,7 +2633,7 @@ a {
 }
 
 .detail-tab-btn.active {
-  background: #ffffff;
+  background: var(--surface);
   color: var(--teal-dark);
   border-color: #e2e8f0 #e2e8f0 #ffffff;
   border-top: 3px solid var(--teal);
@@ -2443,7 +2686,7 @@ a {
 }
 
 .overview-summary-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 20px;
@@ -2614,7 +2857,7 @@ a {
 
 /* Facility Clinical Scope Card */
 .detail-panel-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 22px 26px;
@@ -2738,7 +2981,7 @@ a {
 
 /* Detail Aggregate Banner */
 .detail-aggregate-banner {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid #cbd5e1;
   border-radius: var(--radius-md);
   padding: 18px 22px;
@@ -2853,7 +3096,7 @@ a {
   gap: 18px;
   flex-wrap: wrap;
   padding: 10px 16px;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   font-size: 12px;
@@ -2903,7 +3146,7 @@ a {
 }
 
 .detail-bed-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-left: 4px solid #cbd5e1;
   border-radius: var(--radius-md);
@@ -3103,7 +3346,7 @@ a {
 }
 
 .capability-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 14px 16px;
@@ -3146,7 +3389,7 @@ a {
 }
 
 .specialist-coverage-block {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 18px 20px;
@@ -3196,7 +3439,7 @@ a {
 }
 
 .contact-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 22px 24px;
@@ -3321,7 +3564,7 @@ a {
 }
 
 .sos-modal-dialog {
-  background: #ffffff;
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
   max-width: 540px;
   width: 100%;
@@ -3452,7 +3695,7 @@ a {
 }
 
 .sos-secondary-card {
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   border: 2px solid var(--emergency-border);
   box-shadow: var(--shadow-sm);
@@ -3768,7 +4011,7 @@ a {
   min-height: 42px;
   padding: 8px 10px;
   border-radius: var(--radius-sm);
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line-strong);
   color: var(--ink-secondary);
   font-family: var(--font-sans);
@@ -3829,7 +4072,7 @@ a {
   font-size: 13px;
   font-weight: 700;
   color: var(--teal-dark);
-  background: #ffffff;
+  background: var(--surface-subtle);
   border: 1px solid var(--teal-border);
   border-radius: 4px;
   padding: 3px 8px;
@@ -3865,7 +4108,7 @@ a {
   padding: 0 14px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   font-size: 13.5px;
   font-family: var(--font-sans);
@@ -4018,7 +4261,7 @@ a {
 
 .create-form {
   margin-top: 16px;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 18px;
@@ -4077,7 +4320,7 @@ a {
 }
 
 .admin-hospital-row {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -4148,7 +4391,7 @@ a {
 .empty-state, .loading-state {
   padding: 36px 16px;
   border: 1px dashed var(--line);
-  background: #ffffff;
+  background: var(--surface);
   border-radius: var(--radius-md);
   text-align: center;
   color: var(--muted);
@@ -4318,7 +4561,7 @@ a {
   top: 100%;
   left: 0;
   right: 0;
-  background: #ffffff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   box-shadow: var(--shadow-lg);
   padding: 12px 18px 16px;
@@ -4361,7 +4604,7 @@ a {
 }
 
 .home-hero-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--teal-light) 100%);
   border: 1px solid var(--teal-border);
   border-radius: var(--radius-xl);
   padding: 34px 38px;
@@ -4460,7 +4703,7 @@ a {
 }
 
 .home-category-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 16px 18px;
@@ -4571,7 +4814,7 @@ a {
 }
 
 .freshness-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -4585,6 +4828,30 @@ a {
   padding: 3px 8px;
   border-radius: 4px;
   margin-bottom: 8px;
+}
+
+.freshness-badge-large.fresh-badge {
+  background: var(--fresh-bg);
+  color: var(--fresh-text);
+  border: 1px solid var(--fresh-border);
+}
+
+.freshness-badge-large.overdue-badge {
+  background: var(--overdue-bg);
+  color: var(--overdue-text);
+  border: 1px solid var(--overdue-border);
+}
+
+.freshness-badge-large.stale-badge {
+  background: var(--stale-bg);
+  color: var(--stale-text);
+  border: 1px solid var(--stale-border);
+}
+
+.freshness-badge-large.unknown-badge {
+  background: var(--unknown-bg);
+  color: var(--unknown-text);
+  border: 1px solid var(--unknown-border);
 }
 
 .freshness-card h4 {
@@ -4629,7 +4896,7 @@ a {
 }
 
 .detail-header-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 22px 26px;
@@ -4697,7 +4964,7 @@ a {
 }
 
 .detail-section {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
@@ -4854,7 +5121,7 @@ a {
 }
 
 .emergency-hero-banner {
-  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--emergency-light) 0%, var(--surface) 100%);
   border: 2px solid var(--emergency-border);
   border-radius: var(--radius-xl);
   padding: 28px 32px;
@@ -4875,7 +5142,7 @@ a {
 }
 
 .emergency-kicker {
-  color: var(--emergency-dark);
+  color: var(--emergency-red);
   font-size: var(--text-xs);
   font-weight: 800;
   text-transform: uppercase;
@@ -4885,13 +5152,13 @@ a {
 .emergency-hero-header h1 {
   font: 800 24px 'Manrope', sans-serif;
   letter-spacing: var(--tracking-tight);
-  color: var(--emergency-dark);
+  color: var(--emergency-red);
   margin: 4px 0 6px;
 }
 
 .emergency-lead {
   font-size: var(--text-base);
-  color: #7f1d1d;
+  color: var(--ink-secondary);
   margin: 0;
   line-height: var(--leading-normal);
 }
@@ -4930,11 +5197,11 @@ a {
 }
 
 .emergency-safety-box {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  background: var(--notice-warn-bg);
+  border: 1px solid var(--notice-warn-border);
   border-radius: var(--radius-md);
   padding: 14px 18px;
-  color: #92400e;
+  color: var(--notice-warn-text);
   margin-bottom: 16px;
   font-size: var(--text-sm);
   line-height: 1.55;
@@ -4944,7 +5211,7 @@ a {
   display: block;
   font-size: var(--text-sm);
   font-weight: 700;
-  color: #78350f;
+  color: var(--notice-warn-text);
   margin-bottom: 4px;
 }
 
@@ -4952,6 +5219,7 @@ a {
   margin: 0;
   font-size: var(--text-sm);
   line-height: 1.55;
+  color: var(--notice-warn-p);
 }
 
 .emergency-desktop-box {
@@ -4996,7 +5264,7 @@ a {
 }
 
 .helpline-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 18px;
@@ -5033,7 +5301,7 @@ a {
 }
 
 .emergency-finder-shortcut {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
@@ -5066,7 +5334,7 @@ a {
 .staff-sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: #ffffff;
+  background: var(--surface);
   border-right: 1px solid rgba(18, 54, 43, 0.08);
   display: flex;
   flex-direction: column;
@@ -5239,7 +5507,7 @@ a {
 
 .staff-mobile-topbar {
   display: none;
-  background: #ffffff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   padding: 10px 14px;
   position: sticky;
@@ -5407,7 +5675,7 @@ a {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid rgba(18, 54, 43, 0.12);
   border-radius: 20px;
   padding: 5px 12px;
@@ -5450,7 +5718,7 @@ a {
 }
 
 .bed-header-btn.secondary {
-  background: #ffffff;
+  background: var(--surface);
   color: #334155;
   border: 1px solid rgba(18, 54, 43, 0.12);
 }
@@ -5492,7 +5760,7 @@ a {
 
 /* Common Card Surface */
 .bed-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid rgba(18, 60, 48, 0.08);
   border-radius: 18px;
   padding: 18px 20px;
@@ -5579,7 +5847,7 @@ a {
 }
 
 .ward-tab-btn.active {
-  background: #ffffff;
+  background: var(--surface);
   color: #0f766e;
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -5702,7 +5970,7 @@ a {
 }
 
 .bed-summary-tile {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid rgba(18, 60, 48, 0.08);
   border-radius: 16px;
   padding: 14px 16px;
@@ -6162,7 +6430,7 @@ a {
   border-radius: 6px;
   padding: 3px 8px;
   font-size: 11px;
-  background: #ffffff;
+  background: var(--surface);
   color: #334155;
   outline: none;
 }
@@ -6299,7 +6567,7 @@ a {
   font-size: 13px;
   color: #0f172a;
   outline: none;
-  background: #ffffff;
+  background: var(--surface);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -6497,7 +6765,7 @@ a {
 }
 
 .staff-metric-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -6538,7 +6806,7 @@ a {
 }
 
 .staff-shortcut-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -6608,7 +6876,7 @@ a {
 }
 
 .staff-activity-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 18px 20px;
@@ -6657,7 +6925,7 @@ a {
 }
 
 .staff-facilities-table-wrapper {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   overflow-x: auto;
@@ -6761,7 +7029,7 @@ a {
   padding: 0 14px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: #ffffff;
+  background: var(--surface);
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 13.5px;
@@ -6849,7 +7117,7 @@ a {
 }
 
 .staff-facility-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 18px 20px;
@@ -6996,7 +7264,7 @@ a {
 }
 
 .form-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 20px;
@@ -7225,6 +7493,1743 @@ a {
   .form-grid-2, .form-grid-3 {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================================================
+   Comprehensive Dark Theme Component Adaptations ([data-theme="dark"])
+   ========================================================================== */
+[data-theme="dark"] .topbar {
+  background: var(--surface-overlay);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .mobile-nav-drawer {
+  background: var(--surface);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .nav-link {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .nav-link:hover {
+  color: var(--teal);
+  background: var(--teal-light);
+}
+
+[data-theme="dark"] .nav-link-active {
+  color: var(--teal);
+  background: var(--teal-light);
+}
+
+[data-theme="dark"] .button-outline {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .button-outline:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .button-quiet {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+}
+
+[data-theme="dark"] .button-quiet:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .button-muted {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="search"],
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--muted);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  border-color: var(--teal);
+  outline: 2px solid var(--teal-light);
+}
+
+/* Public Home Page Components */
+[data-theme="dark"] .home-hero-card {
+  background: linear-gradient(135deg, #1f2937 0%, rgba(45, 212, 191, 0.12) 100%);
+  border-color: rgba(45, 212, 191, 0.35);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .home-hero-card h1 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .home-hero-lead {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .home-btn-emergency {
+  background: var(--emergency-light);
+  color: var(--emergency-red);
+  border-color: var(--emergency-border);
+}
+
+[data-theme="dark"] .home-btn-emergency:hover {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: var(--emergency-red);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .home-section-header h2 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .home-section-link {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .home-section-link:hover {
+  color: #5eead4;
+}
+
+[data-theme="dark"] .home-category-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .home-category-card:hover {
+  background: var(--surface-raised);
+  border-color: var(--teal);
+  box-shadow: 0 4px 14px rgba(45, 212, 191, 0.15), var(--shadow-sm);
+}
+
+[data-theme="dark"] .home-category-card strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .home-category-card p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .home-cat-icon-trauma {
+  background: rgba(244, 63, 94, 0.16);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+[data-theme="dark"] .home-cat-icon-cardiac {
+  background: rgba(239, 68, 68, 0.16);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+[data-theme="dark"] .home-cat-icon-icu {
+  background: rgba(99, 102, 241, 0.16);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+[data-theme="dark"] .home-cat-icon-surgery {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .home-cat-icon-pediatric {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+[data-theme="dark"] .home-cat-icon-oxygen {
+  background: rgba(14, 165, 233, 0.16);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.35);
+}
+
+[data-theme="dark"] .freshness-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .freshness-card h4 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .freshness-card p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .demo-notice {
+  border-color: var(--notice-warn-border);
+  background: var(--notice-warn-bg);
+  color: var(--notice-warn-text);
+}
+
+[data-theme="dark"] .demo-notice p {
+  color: var(--notice-warn-p);
+}
+
+[data-theme="dark"] .demo-notice strong {
+  color: #fef08a;
+}
+
+/* Find Hospitals List & Filter Panel */
+[data-theme="dark"] .finder-page-header {
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .finder-safety-banner {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .finder-filter-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .filter-input-wrap input,
+[data-theme="dark"] .filter-input-wrap select {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .quick-care-chip {
+  background: var(--surface-subtle);
+  color: var(--ink-secondary);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .quick-care-chip:hover {
+  background: var(--surface-raised);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .quick-care-chip.active {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .filter-summary-bar {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+/* Hospital Cards */
+[data-theme="dark"] .hospital-card {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .hospital-card:hover {
+  border-color: var(--teal-border);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .hospital-card-selected {
+  background: var(--surface-raised) !important;
+  border-color: var(--teal) !important;
+  border-left-color: var(--teal) !important;
+  box-shadow: 0 0 0 1px var(--teal), var(--shadow-md) !important;
+}
+
+[data-theme="dark"] .card-name-link {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .card-locality-tag {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .route-pill-drive {
+  background: var(--teal-light);
+  color: var(--teal);
+  border-color: var(--teal-border);
+}
+
+[data-theme="dark"] .route-pill-direct {
+  background: var(--surface-subtle);
+  color: var(--ink-secondary);
+  border-color: var(--line);
+}
+
+/* Status & Freshness */
+[data-theme="dark"] .status-open {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border: 1px solid var(--status-open-border);
+}
+
+[data-theme="dark"] .status-closed {
+  background: var(--status-closed-bg);
+  color: var(--status-closed-text);
+  border: 1px solid var(--status-closed-border);
+}
+
+[data-theme="dark"] .freshness-fresh {
+  background: var(--fresh-bg);
+  color: var(--fresh-text);
+  border: 1px solid var(--fresh-border);
+}
+
+[data-theme="dark"] .freshness-overdue {
+  background: var(--overdue-bg);
+  color: var(--overdue-text);
+  border: 1px solid var(--overdue-border);
+}
+
+[data-theme="dark"] .freshness-stale {
+  background: var(--stale-bg);
+  color: var(--stale-text);
+  border: 1px solid var(--stale-border);
+}
+
+[data-theme="dark"] .freshness-unknown {
+  background: var(--unknown-bg);
+  color: var(--unknown-text);
+  border: 1px solid var(--unknown-border);
+}
+
+/* Bed Capacity Aggregate Card */
+[data-theme="dark"] .bed-aggregate-card {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .aggregate-number.number-avail {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .aggregate-number.number-full {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .aggregate-pct-badge {
+  background: var(--teal-light);
+  border-color: var(--teal-border);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .aggregate-progress-track {
+  background: var(--line);
+}
+
+[data-theme="dark"] .aggregate-progress-fill.fill-avail {
+  background: var(--teal);
+}
+
+[data-theme="dark"] .aggregate-progress-fill.fill-full {
+  background: var(--muted-light);
+}
+
+/* Ward-Level Cards */
+[data-theme="dark"] .ward-card-tile {
+  background: var(--surface) !important;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-card-tile.bed-stat-fresh {
+  background: var(--surface) !important;
+  border-left-color: var(--teal);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-card-tile.bed-stat-overdue {
+  background: var(--surface) !important;
+  border-left-color: #fbbf24;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-card-tile.bed-stat-stale {
+  background: var(--surface-subtle) !important;
+  border-left-color: #fb923c;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-card-tile.bed-stat-unknown {
+  background: var(--surface-subtle) !important;
+  border-left-color: var(--line-strong);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-card-tile.ward-tile-selected {
+  background: var(--teal-light) !important;
+  border-color: var(--teal);
+}
+
+[data-theme="dark"] .ward-status-tag.bed-stat-fresh {
+  background: var(--fresh-bg);
+  color: var(--fresh-text);
+  border: 1px solid var(--fresh-border);
+}
+
+[data-theme="dark"] .ward-status-tag.bed-stat-overdue {
+  background: var(--overdue-bg);
+  color: var(--overdue-text);
+  border: 1px solid var(--overdue-border);
+}
+
+[data-theme="dark"] .ward-status-tag.bed-stat-stale {
+  background: var(--stale-bg);
+  color: var(--stale-text);
+  border: 1px solid var(--stale-border);
+}
+
+[data-theme="dark"] .ward-status-tag.bed-stat-unknown {
+  background: var(--unknown-bg);
+  color: var(--unknown-text);
+  border: 1px solid var(--unknown-border);
+}
+
+[data-theme="dark"] .bed-unreported-card {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+}
+
+/* Map Panel & Leaflet Popups */
+[data-theme="dark"] .hospital-map-panel {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .map-container {
+  background: #1e293b;
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .custom-map-popup .leaflet-popup-content-wrapper {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+}
+
+[data-theme="dark"] .custom-map-popup .leaflet-popup-tip {
+  background: var(--surface) !important;
+}
+
+[data-theme="dark"] .popup-name {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .leaflet-bar a {
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  border-bottom-color: var(--line) !important;
+}
+
+[data-theme="dark"] .leaflet-bar a:hover {
+  background-color: var(--surface-subtle) !important;
+  color: var(--teal) !important;
+}
+
+[data-theme="dark"] .leaflet-control-attribution {
+  background: rgba(31, 41, 55, 0.85) !important;
+  color: var(--muted) !important;
+}
+
+[data-theme="dark"] .leaflet-control-attribution a {
+  color: var(--teal) !important;
+}
+
+/* Hospital Details Page */
+[data-theme="dark"] .detail-header-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .detail-tabs-container {
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .detail-tab-btn {
+  background: var(--surface-subtle);
+  color: var(--ink-secondary);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .detail-tab-btn:hover:not(.active) {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+[data-theme="dark"] .detail-tab-btn.active {
+  background: var(--surface);
+  color: var(--teal);
+  border-color: var(--line) var(--line) var(--surface);
+  border-top: 3px solid var(--teal);
+}
+
+[data-theme="dark"] .tab-count-badge {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .overview-summary-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .detail-panel-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .detail-aggregate-banner {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .detail-bed-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .bed-unsupported-card {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .detail-bed-card.bed-stat-fresh {
+  border-left-color: var(--teal);
+}
+
+[data-theme="dark"] .detail-bed-card.bed-stat-overdue {
+  border-left-color: #fbbf24;
+}
+
+[data-theme="dark"] .detail-bed-card.bed-stat-stale {
+  border-left-color: #fb923c;
+}
+
+[data-theme="dark"] .detail-bed-card.bed-stat-unknown {
+  border-left-color: var(--line-strong);
+}
+
+[data-theme="dark"] .bed-freshness-legend {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .detail-table,
+[data-theme="dark"] .staff-table {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .detail-table th,
+[data-theme="dark"] .staff-table th {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .detail-table td,
+[data-theme="dark"] .staff-table td {
+  border-bottom-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .staff-table tr:hover td {
+  background: var(--surface-subtle);
+}
+
+/* Emergency Page & SOS Actions */
+[data-theme="dark"] .emergency-hero-banner {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18) 0%, var(--surface) 100%);
+  border-color: var(--emergency-border);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .emergency-hero-header h1 {
+  color: var(--emergency-red);
+}
+
+[data-theme="dark"] .emergency-lead {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .emergency-kicker {
+  color: var(--emergency-red);
+}
+
+[data-theme="dark"] .emergency-page-card,
+[data-theme="dark"] .emergency-guidance-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .emergency-sos-box {
+  background: var(--emergency-light);
+  border-color: var(--emergency-border);
+}
+
+[data-theme="dark"] .sos-modal-dialog {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .sos-close-btn {
+  background: var(--surface-subtle);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .sos-close-btn:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .sos-safety-alert {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+
+[data-theme="dark"] .sos-safety-alert strong {
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .sos-safety-alert p {
+  color: #fde68a;
+}
+
+[data-theme="dark"] .emergency-safety-box {
+  background: var(--notice-warn-bg);
+  border-color: var(--notice-warn-border);
+  color: var(--notice-warn-text);
+}
+
+[data-theme="dark"] .emergency-safety-box strong {
+  color: var(--notice-warn-text);
+}
+
+[data-theme="dark"] .emergency-safety-box p {
+  color: var(--notice-warn-p);
+}
+
+[data-theme="dark"] .sos-desktop-notice,
+[data-theme="dark"] .emergency-desktop-box {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .sos-desktop-notice strong,
+[data-theme="dark"] .emergency-desktop-box strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .sos-desktop-notice p,
+[data-theme="dark"] .emergency-desktop-box p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .sos-dial-highlight {
+  color: var(--emergency-red);
+  font-weight: 700;
+}
+
+[data-theme="dark"] .sos-primary-card {
+  background: var(--emergency-red);
+  color: #ffffff;
+  border-color: var(--emergency-dark);
+}
+
+[data-theme="dark"] .sos-primary-card:hover {
+  background: var(--emergency-dark);
+}
+
+[data-theme="dark"] .sos-call-card.sos-secondary-card,
+[data-theme="dark"] .sos-secondary-card {
+  background: var(--surface) !important;
+  border-color: var(--emergency-border) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme="dark"] .sos-call-card.sos-secondary-card:hover,
+[data-theme="dark"] .sos-secondary-card:hover {
+  background: var(--surface-raised) !important;
+  border-color: var(--emergency-red) !important;
+}
+
+[data-theme="dark"] .sos-secondary-card .sos-number {
+  color: var(--emergency-red) !important;
+}
+
+[data-theme="dark"] .sos-secondary-card .sos-label {
+  color: var(--ink) !important;
+}
+
+[data-theme="dark"] .sos-secondary-card .sos-desc {
+  color: var(--muted) !important;
+}
+
+[data-theme="dark"] .sos-secondary-icon {
+  background: rgba(239, 68, 68, 0.2) !important;
+}
+
+[data-theme="dark"] .sos-test-card {
+  background: rgba(45, 212, 191, 0.12) !important;
+  border: 2px dashed rgba(45, 212, 191, 0.5) !important;
+  color: var(--teal) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .sos-test-card:hover {
+  background: rgba(45, 212, 191, 0.2) !important;
+  border-color: var(--teal) !important;
+}
+
+[data-theme="dark"] .sos-test-icon {
+  background: rgba(45, 212, 191, 0.25) !important;
+  color: var(--teal) !important;
+}
+
+[data-theme="dark"] .sos-test-card .sos-number {
+  color: var(--teal) !important;
+}
+
+[data-theme="dark"] .sos-test-card .sos-label {
+  color: var(--teal) !important;
+}
+
+[data-theme="dark"] .sos-test-card .sos-desc {
+  color: var(--ink-secondary) !important;
+}
+
+[data-theme="dark"] .emergency-call-cta {
+  background: rgba(255, 255, 255, 0.15);
+  color: inherit;
+}
+
+[data-theme="dark"] .emergency-directory-section h2 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .helpline-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .helpline-card strong {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .helpline-card span {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .helpline-card p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .helpline-link {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .helpline-link:hover {
+  color: #5eead4;
+}
+
+[data-theme="dark"] .emergency-finder-shortcut {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .emergency-finder-shortcut h3 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .emergency-finder-shortcut p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .compact-hero-emergency-panel {
+  background: var(--emergency-light);
+  border-color: var(--emergency-border);
+}
+
+[data-theme="dark"] .emergency-callout-header strong {
+  color: var(--emergency-red);
+}
+
+[data-theme="dark"] .emergency-callout-header span {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .sos-quick-108 {
+  background: var(--surface);
+  color: var(--emergency-red);
+  border-color: var(--emergency-border);
+}
+
+[data-theme="dark"] .sos-quick-108:hover {
+  background: var(--surface-raised);
+  border-color: var(--emergency-red);
+}
+
+[data-theme="dark"] .emergency-disclaimer-micro {
+  color: var(--emergency-red);
+}
+
+/* Public Find Hospitals & Map Popups */
+[data-theme="dark"] .card-bed-availability {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .bed-section-title {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .aggregate-primary-label {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .aggregate-subtext {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .bed-report-timestamp {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .bed-report-timestamp .time-sep {
+  color: var(--line-strong);
+}
+
+[data-theme="dark"] .bed-report-timestamp .time-exact {
+  color: var(--muted-light);
+}
+
+[data-theme="dark"] .unreported-title {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .unreported-desc {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .ward-tile-name {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .popup-card {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .popup-city {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .popup-name {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .popup-address {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .popup-capacity-summary {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .popup-bed-stat strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .popup-bed-stat strong.text-green {
+  color: #34d399;
+}
+
+[data-theme="dark"] .popup-bed-stat strong.text-muted {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .popup-bed-stat small {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .popup-status.open {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border: 1px solid var(--status-open-border);
+}
+
+[data-theme="dark"] .popup-status.closed {
+  background: var(--status-closed-bg);
+  color: var(--status-closed-text);
+  border: 1px solid var(--status-closed-border);
+}
+
+[data-theme="dark"] .popup-phone {
+  color: var(--teal);
+}
+
+/* Staff Workspace Architecture */
+[data-theme="dark"] .staff-workspace {
+  background: var(--bg);
+}
+
+[data-theme="dark"] .staff-main-area {
+  background: var(--bg);
+}
+
+[data-theme="dark"] .staff-sidebar {
+  background: var(--surface);
+  border-right-color: var(--line);
+}
+
+[data-theme="dark"] .staff-sidebar-header,
+[data-theme="dark"] .staff-sidebar-footer {
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-user-card {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-user-avatar {
+  background: var(--teal);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .staff-nav-item {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .staff-nav-item:hover {
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .staff-nav-item.active {
+  background: var(--teal-light);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .staff-mobile-topbar {
+  background: var(--surface);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .staff-mobile-menu {
+  background: var(--surface);
+  border-top-color: var(--line);
+}
+
+[data-theme="dark"] .staff-metric-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-metric-title {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .staff-metric-number {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .staff-metric-sub {
+  color: var(--muted);
+}
+
+/* Staff Reports Bed Availability Reference-Matched Workspace */
+[data-theme="dark"] .bed-workspace-surface {
+  background: var(--bg);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .bed-category-pill {
+  background: var(--teal-light);
+  color: var(--teal);
+  border: 1px solid var(--teal-border);
+}
+
+[data-theme="dark"] .bed-category-pill .pill-dot {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .bed-title-row h1 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .live-sync-indicator {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border-color: var(--status-open-border);
+}
+
+[data-theme="dark"] .bed-header-subtitle {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .bed-facility-select-wrapper {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .bed-facility-select {
+  color: var(--ink);
+  background: transparent;
+}
+
+[data-theme="dark"] .bed-facility-select option {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .bed-header-btn.secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .bed-header-btn.secondary:hover {
+  background: var(--surface-subtle);
+  color: var(--teal);
+  border-color: var(--teal);
+}
+
+[data-theme="dark"] .bed-header-btn.primary {
+  background: var(--teal);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .bed-header-btn.primary:hover {
+  background: var(--teal-dark);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .bed-alert-box.error {
+  background: var(--emergency-light);
+  border-color: var(--emergency-border);
+  color: var(--emergency-red);
+}
+
+[data-theme="dark"] .bed-alert-box.success {
+  background: var(--status-open-bg);
+  border-color: var(--status-open-border);
+  color: var(--status-open-text);
+}
+
+[data-theme="dark"] .bed-card {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .card-title-group h2 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .card-icon-badge {
+  background: var(--teal-light);
+  border: 1px solid var(--teal-border);
+}
+
+[data-theme="dark"] .card-intro-note {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .ward-pill-tabs {
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+}
+
+[data-theme="dark"] .ward-tab-btn {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .ward-tab-btn:hover {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-tab-btn.active {
+  background: var(--surface);
+  color: var(--teal);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .bed-status-pill.ready {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border: 1px solid var(--status-open-border);
+}
+
+[data-theme="dark"] .bed-status-pill.full {
+  background: var(--emergency-light);
+  color: var(--emergency-red);
+  border: 1px solid var(--emergency-border);
+}
+
+[data-theme="dark"] .bed-status-pill.unknown {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+[data-theme="dark"] .ward-name-heading {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-meta-strip {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .meta-sep {
+  color: var(--line-strong);
+}
+
+[data-theme="dark"] .ward-desc-text {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .overview-footer-meta {
+  color: var(--muted);
+  border-top-color: var(--line);
+}
+
+[data-theme="dark"] .bed-summary-tile {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .tile-label {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .tile-arrow-icon {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .tile-metric-value {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .tile-metric-value.freshness {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .tile-subtext {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .tile-progress-bar {
+  background: var(--line);
+}
+
+[data-theme="dark"] .tile-progress-fill {
+  background: var(--teal);
+}
+
+[data-theme="dark"] .tile-progress-unreported {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--line),
+    var(--line) 4px,
+    var(--surface-subtle) 4px,
+    var(--surface-subtle) 8px
+  );
+}
+
+[data-theme="dark"] .mini-ward-pill.reported {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border: 1px solid var(--status-open-border);
+}
+
+[data-theme="dark"] .mini-ward-pill.missing {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+[data-theme="dark"] .tile-audit-status {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .facility-status-badge.verified {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border-color: var(--status-open-border);
+}
+
+[data-theme="dark"] .facility-status-badge.pending {
+  background: var(--overdue-bg);
+  color: var(--overdue-text);
+  border-color: var(--overdue-border);
+}
+
+[data-theme="dark"] .facility-status-badge.unverified {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .facility-avatar {
+  background: var(--blue-light);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+
+[data-theme="dark"] .facility-display-name {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .facility-locality {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .facility-hotline-box {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .hotline-label {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .hotline-number {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .caps-title {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .caps-pill {
+  background: var(--surface-subtle);
+  color: var(--ink-secondary);
+  border: 1px solid var(--line);
+}
+
+[data-theme="dark"] .reporter-tenancy-strip {
+  border-top-color: var(--line);
+}
+
+[data-theme="dark"] .reporter-avatar {
+  background: var(--teal);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .reporter-email {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .reporter-role {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .breakdown-total-tag {
+  color: var(--teal);
+  background: var(--teal-light);
+  border: 1px solid var(--teal-border);
+}
+
+[data-theme="dark"] .ward-breakdown-row {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .ward-breakdown-row:hover {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+}
+
+[data-theme="dark"] .ward-breakdown-row.selected {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+
+[data-theme="dark"] .ward-label {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .ward-row-count {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .ward-row-count strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .unreported-text {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .ward-row-bar {
+  background: var(--line);
+}
+
+[data-theme="dark"] .ward-row-bar-empty {
+  background: var(--line);
+}
+
+[data-theme="dark"] .history-filter-select {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .history-table-wrapper {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+[data-theme="dark"] .history-table th {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .history-table td {
+  border-bottom-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .history-table tr:hover td {
+  background: var(--surface-subtle);
+}
+
+[data-theme="dark"] .report-time-primary {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .report-time-rel {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .table-ward-pill {
+  background: var(--blue-light);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+
+[data-theme="dark"] .table-count-strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .table-count-sep {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .table-count-total {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .table-source-tag {
+  color: var(--muted);
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+}
+
+[data-theme="dark"] .table-status-published {
+  color: var(--status-open-text);
+}
+
+[data-theme="dark"] .empty-history-state {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .bed-form-group label {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .bed-form-input {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .bed-form-input:focus {
+  border-color: var(--teal);
+  outline: 2px solid var(--teal-light);
+}
+
+[data-theme="dark"] .form-preview-box {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .preview-ok {
+  color: var(--status-open-text);
+}
+
+[data-theme="dark"] .preview-error {
+  color: var(--emergency-red);
+}
+
+[data-theme="dark"] .form-audit-disclaimer {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .bed-submit-btn {
+  background: var(--teal);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .bed-submit-btn:hover:not(:disabled) {
+  background: var(--teal-dark);
+  color: #ffffff;
+}
+
+/* Staff Facilities & Activity Panels */
+[data-theme="dark"] .staff-activity-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-activity-header h2 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .staff-activity-count {
+  background: var(--surface-subtle);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .staff-empty-activity {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .staff-facilities-table-wrapper {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-facilities-table th {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .staff-facilities-table td {
+  border-bottom-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .staff-facilities-table tr:hover td {
+  background: var(--surface-subtle);
+}
+
+[data-theme="dark"] .staff-form-panel {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .form-panel-header h2 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .form-panel-header p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .field-label {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .form-control-input {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .form-control-input:focus {
+  border-color: var(--teal);
+  outline: 2px solid var(--teal-light);
+}
+
+[data-theme="dark"] .form-control-input:disabled {
+  background: var(--bg);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .verification-pill-verified {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border-color: var(--status-open-border);
+}
+
+[data-theme="dark"] .verification-pill-pending {
+  background: var(--overdue-bg);
+  color: var(--overdue-text);
+  border-color: var(--overdue-border);
+}
+
+[data-theme="dark"] .verification-pill-draft,
+[data-theme="dark"] .verification-pill-unverified {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-facility-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-facility-card:hover {
+  border-color: var(--teal-border);
+}
+
+[data-theme="dark"] .facility-card-avatar {
+  background: var(--teal-light);
+  color: var(--teal);
+  border-color: var(--teal-border);
+}
+
+[data-theme="dark"] .facility-card-name {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .facility-card-address {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .facility-card-meta {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .facility-meta-chip {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .meta-chip-label {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .facility-card-actions {
+  border-top-color: var(--line);
+}
+
+[data-theme="dark"] .form-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .form-stack label {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .staff-ward-overview-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .staff-ward-select-btn {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .staff-ward-select-btn.active {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .staff-login-card,
+[data-theme="dark"] .admin-login {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .demo-credentials-box {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .demo-preset-pill {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .demo-preset-pill:hover {
+  background: var(--surface-subtle);
+  border-color: var(--teal);
+}
+
+[data-theme="dark"] .demo-preset-pill.active {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .loading-state {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .role-restricted-notice {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .live-chip {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border-color: var(--status-open-border);
+}
+
+[data-theme="dark"] .success-box {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border-color: var(--status-open-border);
+}
+
+[data-theme="dark"] .not-found-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .not-found-card h1 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .not-found-card p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .method-note {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .method-note strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .method-note p {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .panel-header-badge {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .total-badge-label {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .total-badge-number {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .banner-title {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .banner-subtext {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .banner-pct-badge {
+  background: var(--status-open-bg);
+  color: var(--status-open-text);
+  border-color: var(--status-open-border);
+}
+
+[data-theme="dark"] .detail-service-item {
+  background: var(--teal-light);
+  border-color: var(--teal-border);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .caps-pill-more-btn {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+  color: var(--teal);
+}
+
+[data-theme="dark"] .detail-breadcrumb {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .detail-breadcrumb a {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .breadcrumb-current {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .detail-title-col h1 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .detail-address {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .footer {
+  background: var(--surface);
+  border-top-color: var(--line);
+}
+
+[data-theme="dark"] .footer-heading {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .footer-link {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .footer-link:hover {
+  color: var(--teal);
+}
+
+[data-theme="dark"] .footer-bottom {
+  color: var(--muted);
+  border-top-color: var(--line);
 }
 
 @media (prefers-reduced-motion: reduce) {

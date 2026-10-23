@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { EmergencySOSModal, SOSHeaderButton, SOSMobileFloatingButton } from '../components/EmergencySOSModal.jsx';
+import { ThemeToggle } from '../components/ThemeToggle.jsx';
 import { getSosTestAction } from '../utils/sos.js';
 
 export function PublicLayout() {
@@ -60,6 +61,9 @@ export function PublicLayout() {
               </button>
             )}
 
+            {/* Application-Wide Light / Dark Theme Toggle */}
+            <ThemeToggle variant="header" id="public-header-theme-toggle" />
+
             {isAuthenticated ? (
               <Link to="/staff" className="button button-outline staff-link-btn" title={`Signed in as ${user?.email}`}>
                 Staff Portal ↗
@@ -109,6 +113,11 @@ export function PublicLayout() {
               Emergency Assistance
             </NavLink>
             <hr className="mobile-nav-divider" />
+            <ThemeToggle
+              variant="mobile"
+              id="public-mobile-theme-toggle"
+              onClick={() => setMobileMenuOpen(false)}
+            />
             {isAuthenticated ? (
               <Link
                 to="/staff"

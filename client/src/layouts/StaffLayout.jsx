@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { ThemeToggle } from '../components/ThemeToggle.jsx';
 
 export function StaffLayout() {
   const { user, isAuthenticated, role, logout } = useAuth();
@@ -98,6 +99,7 @@ export function StaffLayout() {
 
         {/* Sidebar Footer Actions */}
         <div className="staff-sidebar-footer">
+          <ThemeToggle variant="sidebar" id="staff-sidebar-theme-toggle" />
           <Link to="/find-hospitals" className="staff-nav-item public-return-link">
             <span className="staff-nav-icon">↗</span>
             <span>Public Hospital Finder</span>
@@ -127,14 +129,17 @@ export function StaffLayout() {
                 <small className="staff-portal-label">Staff Portal</small>
               </span>
             </Link>
-            <button
-              type="button"
-              className="mobile-menu-btn"
-              onClick={() => setMobileMenuOpen((o) => !o)}
-              aria-label="Toggle staff menu"
-            >
-              {mobileMenuOpen ? '✕' : '☰'}
-            </button>
+            <div className="staff-mobile-header-actions">
+              <ThemeToggle variant="header" id="staff-mobile-header-theme-toggle" />
+              <button
+                type="button"
+                className="mobile-menu-btn"
+                onClick={() => setMobileMenuOpen((o) => !o)}
+                aria-label="Toggle staff menu"
+              >
+                {mobileMenuOpen ? '✕' : '☰'}
+              </button>
+            </div>
           </div>
 
           {mobileMenuOpen && (
@@ -177,6 +182,11 @@ export function StaffLayout() {
                 </NavLink>
               )}
               <hr className="mobile-nav-divider" />
+              <ThemeToggle
+                variant="mobile"
+                id="staff-mobile-drawer-theme-toggle"
+                onClick={() => setMobileMenuOpen(false)}
+              />
               <Link
                 to="/find-hospitals"
                 className="staff-mobile-nav-link"
