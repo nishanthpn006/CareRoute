@@ -62,21 +62,51 @@ export function AuthProvider({ children }) {
         return meta;
       }
 
-      const result = await apiRequest('/api/auth/demo-login', {
-        method: 'POST',
-        auth: false,
-        body: JSON.stringify({ email, password }),
-      });
+      // Individual staff authentication via POST /api/auth/login
+      try {
+        const result = await apiRequest('/api/auth/login', {
+          method: 'POST',
+          auth: false,
+          body: JSON.stringify({ email, password }),
+        });
 
-      setSessionToken(result.token);
-      const meta = result.user || {
-        email: result.email,
-        role: result.role,
-        organizationId: result.organizationId,
-      };
-      setUser(meta);
-      localStorage.setItem('careroute_user_meta', JSON.stringify(meta));
-      return meta;
+        setSessionToken(result.token);
+        const meta = result.user || {
+          id: result.id,
+          email: result.email,
+          role: result.role,
+          organizationId: result.organizationId,
+          assignedFacilityIds: result.assignedFacilityIds || [],
+        };
+        setUser(meta);
+        localStorage.setItem('careroute_user_meta', JSON.stringify(meta));
+        return meta;
+      } catch (loginErr) {
+        // In local development evaluation only, allow fallback to demo-login
+        if (!import.meta.env.PROD) {
+          try {
+            const demoResult = await apiRequest('/api/auth/demo-login', {
+              method: 'POST',
+              auth: false,
+              body: JSON.stringify({ email, password }),
+            });
+            setSessionToken(demoResult.token);
+            const meta = demoResult.user || {
+              id: demoResult.id,
+              email: demoResult.email,
+              role: demoResult.role,
+              organizationId: demoResult.organizationId,
+              assignedFacilityIds: demoResult.assignedFacilityIds || [],
+            };
+            setUser(meta);
+            localStorage.setItem('careroute_user_meta', JSON.stringify(meta));
+            return meta;
+          } catch {
+            // Re-throw primary login error
+          }
+        }
+        throw loginErr;
+      }
     } catch (err) {
       setError(err.message);
       throw err;

@@ -75,6 +75,37 @@ export class FirestoreStorageAdapter {
     return snap.empty ? null : structuredClone(snap.docs[0].data());
   }
 
+  async getUserPasswordHashByEmail(email) {
+    if (!email) return null;
+    const normalized = String(email).trim().toLowerCase();
+    const snap = await this.db.collection('users').where('email', '==', normalized).limit(1).get();
+    if (snap.empty) return null;
+    const data = snap.docs[0].data();
+    return {
+      id: data.id,
+      email: data.email,
+      status: data.status,
+      passwordHash: data.passwordHash || null,
+    };
+  }
+
+  async setUserPassword(userIdOrEmail, passwordHash) {
+    if (!userIdOrEmail || !passwordHash) {
+      throw new Error('User identifier and password hash are required.');
+    }
+    const target = String(userIdOrEmail).trim().toLowerCase();
+    let docRef = this.db.collection('users').doc(target);
+    let snap = await docRef.get();
+    if (!snap.exists) {
+      const emailSnap = await this.db.collection('users').where('email', '==', target).limit(1).get();
+      if (emailSnap.empty) return null;
+      docRef = emailSnap.docs[0].ref;
+    }
+    await docRef.update({ passwordHash });
+    const updated = (await docRef.get()).data();
+    return structuredClone(updated);
+  }
+
   async registerUser(userData) {
     const id = userData.id || `user-${randomUUID()}`;
     const user = {
@@ -87,6 +118,9 @@ export class FirestoreStorageAdapter {
       assignedFacilityIds: Array.isArray(userData.assignedFacilityIds) ? [...userData.assignedFacilityIds] : [],
       createdAt: new Date().toISOString(),
     };
+    if (userData.passwordHash) {
+      user.passwordHash = userData.passwordHash;
+    }
     await this.db.collection('users').doc(id).set(user);
     return structuredClone(user);
   }
@@ -770,5 +804,13 @@ export class FirestoreStorageAdapter {
         await batch.commit();
       }
     }
+  }
+
+  async ping() {
+    return { ok: true };
+  }
+
+  async close() {
+    return;
   }
 }

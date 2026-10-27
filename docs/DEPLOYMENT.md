@@ -1,9 +1,9 @@
 # CareRoute — College Demonstration Deployment Guide
 
-**Document version:** 1.0  
-**Target release:** Milestone 6 Deployment Readiness  
-**Target platforms:** Vercel (Frontend Single Page Application) & Render (Backend Web Service)  
-**Status:** Pre-deployment validated specification (No live resources created yet)  
+**Document version:** 1.0
+**Target release:** Milestone 6 Deployment Readiness
+**Target platforms:** Vercel (Frontend Single Page Application) & Render (Backend Web Service)
+**Status:** Pre-deployment validated specification (No live resources created yet)
 
 ---
 
@@ -99,10 +99,16 @@ Configure these in the **Render Web Service → Environment Variables**:
 | `DEMO_ADMIN_EMAIL` | **Yes** | `admin@careroute.local` | Platform administrator account email for demonstration sign-in. |
 | `DEMO_ADMIN_PASSWORD` | **Yes** | `[REPLACE_WITH_SECURE_PRESENTATION_PASSWORD]` | Secret demonstration password used to authenticate all seeded demo staff roles. |
 | `PORT` | Auto | *(Injected by Render)* | Render assigns dynamic port (typically `10000`). |
+| `ENABLE_DEMO_LOGIN` | Optional | `false` | Gate for demo login routes (`/api/auth/demo-login`). Must remain `false` (default) in production. |
+| `DATABASE_URL` | For Postgres | *(Managed DB URL)* | PostgreSQL connection string (`postgres://user:pass@host:5432/dbname`). |
+| `DATABASE_SSL` | For Postgres | `true` | Enables TLS for PostgreSQL connections. Set to `true` on managed cloud providers. |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | For Postgres | `true` | Enforces TLS certificate validation. Defaults to `true`. Never set to `false` in production. |
+| `DATABASE_SSL_CA` | For Postgres | *(Optional)* | Custom CA certificate string or path if the database provider requires a custom root CA. |
 
 > [!CAUTION]
 > Never use placeholder values such as `password123` or copy default strings from `.env.example` in a public deployment. Generate a fresh secret using:
 > `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+> In production environments utilizing PostgreSQL (`DATA_MODE=postgres`), ensure `ENABLE_DEMO_LOGIN=false` is enforced so that unauthenticated actors cannot access staff routes using shared demo presets.
 
 ---
 
@@ -252,3 +258,196 @@ In the event of an unexpected runtime failure or demonstration glitch:
      cd client && npm run dev
      ```
    - Connect via `http://localhost:5173`. Local operation uses identical components and requires zero internet connectivity for local mock tiles or offline testing.
+
+---
+
+## 8. PostgreSQL Backup, Protection, and Recovery Procedures
+
+When CareRoute is deployed with persistent PostgreSQL storage (`DATA_MODE=postgres`), operational availability reports, facility registry states, and audit trails must be reliably backed up and safeguarded against disaster or data loss.
+
+### A. Backup Generation (`pg_dump`)
+
+Database backups should be taken automatically on a scheduled basis (e.g., daily full snapshot, with WAL archiving for point-in-time recovery on managed providers):
+
+```bash
+# Generate custom compressed archive
+pg_dump -Fc --no-acl --no-owner \
+  -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
+  -f "/tmp/careroute_backup_$(date +%Y%m%d_%H%M%S).dump"
+```
+
+> [!WARNING]
+> **Compression Is Not Encryption!**
+> A compressed PostgreSQL dump file (`pg_dump -Fc` or `.sql.gz`) only reduces file size. **It is NOT encrypted.** All hospital metadata, verification logs, staff emails, and availability reports remain readable in plaintext to anyone who gains access to the dump file. Unencrypted backup dumps must never be transmitted over public networks or stored in unencrypted storage buckets.
+
+---
+
+### B. Protecting and Encrypting Backups at Rest
+
+To comply with health data protection standards and operational security best practices:
+
+1. **Encrypt Before Storage or Egress**:
+   Encrypt backup archives immediately following dump completion using strong symmetric encryption (AES-256) before uploading to object storage:
+   ```bash
+   # Example: Encrypting backup with OpenSSL AES-256-CBC
+   openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 \
+     -in /tmp/careroute_backup_20261027.dump \
+     -out /tmp/careroute_backup_20261027.dump.enc \
+     -pass env:BACKUP_ENCRYPTION_KEY
+
+   # Securely shred the temporary plaintext dump immediately
+   shred -u /tmp/careroute_backup_20261027.dump
+   ```
+   *(Alternatively, use `gpg --symmetric --cipher-algo AES256` or `age -r <public-key>` for public-key encryption.)*
+
+2. **Encryption Key Isolation**:
+   - The backup encryption key (`BACKUP_ENCRYPTION_KEY`) must **never** be stored on the database server itself or co-located with the backup archive.
+   - Store keys in a dedicated Cloud KMS, HashiCorp Vault, or offline secrets manager.
+
+3. **Storage Immutability and Access Control**:
+   - Store encrypted backups in dedicated object storage (e.g., AWS S3 with Object Lock or GCP Cloud Storage Bucket Lock) enforcing WORM (Write-Once-Read-Many) policies.
+   - Enforce least-privilege IAM policies: the backup runner role should possess write-only permissions (`s3:PutObject`), preventing a compromised runner from deleting or reading existing archives.
+   - Enforce server-side encryption with KMS customer-managed keys (dual-layer defense).
+
+4. **File Permissions & Retention**:
+   - Restrict local staging file permissions to `chmod 600`.
+   - Implement automated lifecycle deletion policies (e.g., 30-day daily retention, 12-month monthly retention).
+
+---
+
+### C. Restoration Verification Procedure
+
+An unverified backup is not a valid backup. Restoration procedures must be periodically tested in an isolated sandbox environment without impacting live operations.
+
+> [!CAUTION]
+> **Never test restoration on a production database.** Always restore to a temporary or staging instance.
+
+#### Periodic Verification Drill:
+
+1. **Provision Staging Database**:
+   Create an isolated verification database:
+   ```bash
+   createdb -h localhost -U postgres careroute_restore_test
+   ```
+
+2. **Decrypt Archive in Memory / Secure Directory**:
+   ```bash
+   openssl enc -d -aes-256-cbc -pbkdf2 -iter 100000 \
+     -in /tmp/careroute_backup_20261027.dump.enc \
+     -out /tmp/careroute_restoring.dump \
+     -pass env:BACKUP_ENCRYPTION_KEY
+   ```
+
+3. **Execute Clean Restore**:
+   ```bash
+   pg_restore -v --clean --no-acl --no-owner \
+     -h localhost -U postgres -d careroute_restore_test \
+     /tmp/careroute_restoring.dump
+
+   # Immediately remove decrypted dump file
+   shred -u /tmp/careroute_restoring.dump
+   ```
+
+4. **Validate Data Integrity & Health**:
+   Execute programmatic checks against `careroute_restore_test`:
+   ```sql
+   -- Verify core tables and records exist
+   SELECT COUNT(*) AS total_facilities FROM facilities;
+   SELECT COUNT(*) AS total_reports FROM availability_reports;
+   SELECT COUNT(*) AS total_snapshots FROM availability_current;
+   SELECT COUNT(*) AS total_audit_entries FROM audit_events;
+
+   -- Verify latest migration applied
+   SELECT MAX(name) FROM schema_migrations;
+   ```
+
+5. **Application Health Verification**:
+   Run the test suite or launch a temporary backend pointing to `careroute_restore_test`:
+   ```bash
+   DATABASE_URL="postgres://user:pass@localhost:5432/careroute_restore_test" npm test
+   ```
+   Confirm that all domain read/write operations pass.
+
+6. **Tear Down**:
+   Drop the test database once verification completes:
+   ```bash
+   dropdb -h localhost -U postgres careroute_restore_test
+   ```
+
+---
+
+## 9. Individual Staff Authentication & Secure Account Provisioning
+
+CareRoute supports persistent individual staff authentication backed by PostgreSQL. Shared demo credentials and universal passwords are strictly prohibited in production.
+
+### A. Authentication Architecture
+
+- **Password Hashing Algorithm**: Argon2id (`argon2id`, memory: 64 MB, iterations: 3, parallelism: 4).
+- **Schema**: PostgreSQL migration `002_add_user_password_hash.sql` provides the `password_hash` column on `users`.
+- **Zero Plaintext Storage**: Plaintext passwords are never persisted to disk, written to logs, or included in API responses.
+- **Unprovisioned Account Default Denial**: Pre-seeded staff accounts have `password_hash = NULL` by default. They cannot log in via `/api/auth/login` until an individual password has been explicitly provisioned.
+- **User Enumeration Defense**: Invalid passwords, unprovisioned accounts, and non-existent emails return an identical generic response:
+  ```json
+  HTTP/1.1 401 Unauthorized
+  { "error": "Invalid email or password." }
+  ```
+  Constant-time dummy hashing is executed when an email is unknown, neutralizing timing-based user enumeration.
+- **Brute-Force Rate Limiting**: The login endpoint enforces rate limiting (5 failed attempts per 15-minute window per IP and email combination). Excess requests are rejected with:
+  ```json
+  HTTP/1.1 429 Too Many Requests
+  Retry-After: 900
+  { "error": "Too many login attempts. Please try again later." }
+  ```
+
+---
+
+### B. Safe Account Provisioning Procedure
+
+Staff credentials must be provisioned locally or via a secure administrative session using the `set-password` CLI script.
+
+> [!IMPORTANT]
+> **No Universal Default Passwords**:
+> CareRoute does not create default administrator passwords. Every operational staff member and platform administrator must have a unique password explicitly set.
+
+#### Provisioning Steps:
+
+1. **Verify Target User Exists in Database**:
+   The staff member must already be registered in the `users` table with their assigned role and facility/organization relations.
+
+2. **Execute Interactive Password Tool**:
+   From the server directory (or production container shell):
+   ```bash
+   # Syntax: npm run set-password -- <staff-email>
+   npm run set-password -- admin@careroute.local
+   ```
+
+3. **Provide Password Interactively**:
+   The tool prompts for the password without echoing keystrokes to the terminal screen:
+   ```text
+   Enter new password for admin@careroute.local (organization_admin): [hidden]
+   Confirm password: [hidden]
+   ```
+   - **Minimum Length**: 10 characters.
+   - **Shell Safety**: The password never appears in shell history (`.bash_history`), process listings (`ps aux`), or command-line arguments.
+
+4. **Verify Provisioning Result**:
+   The tool will output:
+   ```text
+   [CareRoute Admin] Success: Password set for "admin@careroute.local" (organization_admin).
+   [CareRoute Admin] Existing role, organization, and facility assignments preserved.
+   [CareRoute Admin] Account is now ready for individual login.
+   ```
+   An audit log record is automatically written to `audit_events` (`action: user.password_provisioned`).
+
+---
+
+### C. Design Decisions & Security Controls
+
+1. **No Public Registration**:
+   Public registration endpoints are intentionally not implemented. Hospital staff and facility reporters are provisioned by organization administrators or authorized deployment operators.
+2. **No Unauthenticated Password Reset**:
+   CareRoute does not expose unauthenticated email password-reset links (which introduce account takeover vectors without corporate email integration). Password resets require administrative provisioning through the CLI or authorized internal ticketing.
+3. **Account Deactivation Immediate Enforcement**:
+   Setting a user's status to `inactive` or `suspended` immediately revokes login permissions (`403 Forbidden`) and invalidates active session tokens upon the next request.
+4. **Deleted User Immediate Rejection**:
+   Tokens presenting a user ID or email that has been deleted from PostgreSQL are rejected with `401 Unauthorized` without synthesizing fallback records.

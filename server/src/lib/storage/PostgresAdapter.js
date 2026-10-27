@@ -256,6 +256,37 @@ export class PostgresStorageAdapter {
     return mapUserRow(rows[0]);
   }
 
+  async getUserPasswordHashByEmail(email) {
+    if (!email) return null;
+    const normalized = String(email).trim().toLowerCase();
+    const { rows } = await this.pool.query(
+      'SELECT id, email, status, password_hash FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1',
+      [normalized]
+    );
+    if (!rows.length) return null;
+    return {
+      id: rows[0].id,
+      email: rows[0].email,
+      status: rows[0].status,
+      passwordHash: rows[0].password_hash,
+    };
+  }
+
+  async setUserPassword(userIdOrEmail, passwordHash) {
+    if (!userIdOrEmail || !passwordHash) {
+      throw new Error('User identifier and password hash are required.');
+    }
+    const target = String(userIdOrEmail).trim().toLowerCase();
+    const { rows } = await this.pool.query(`
+      UPDATE users
+      SET password_hash = $1
+      WHERE id = $2 OR LOWER(email) = $2
+      RETURNING id, email, name, role, status, organization_id, assigned_facility_ids, created_at
+    `, [passwordHash, target]);
+    if (!rows.length) return null;
+    return mapUserRow(rows[0]);
+  }
+
   async registerUser(userData) {
     const id = userData.id || `user-${randomUUID()}`;
     const email = userData.email.toLowerCase();
@@ -264,13 +295,14 @@ export class PostgresStorageAdapter {
     const status = userData.status || 'active';
     const organizationId = userData.organizationId || null;
     const assignedFacilityIds = Array.isArray(userData.assignedFacilityIds) ? userData.assignedFacilityIds : [];
+    const passwordHash = userData.passwordHash || null;
 
     const { rows } = await this.pool.query(`
       INSERT INTO users (
-        id, email, name, role, status, organization_id, assigned_facility_ids, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+        id, email, name, role, status, organization_id, assigned_facility_ids, created_at, password_hash
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8)
       RETURNING *
-    `, [id, email, name, role, status, organizationId, JSON.stringify(assignedFacilityIds)]);
+    `, [id, email, name, role, status, organizationId, JSON.stringify(assignedFacilityIds), passwordHash]);
 
     return mapUserRow(rows[0]);
   }
@@ -1029,6 +1061,33 @@ export class PostgresStorageAdapter {
     });
 
     return updated;
+  }
+
+  async ping(timeoutMs = 3000) {
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        const err = new Error('Database ping timed out.');
+        err.code = 'ETIMEDOUT';
+        reject(err);
+      }, timeoutMs);
+    });
+
+    const queryPromise = (async () => {
+      const client = await this.pool.connect();
+      try {
+        await client.query('SELECT 1');
+        return { ok: true };
+      } finally {
+        client.release();
+      }
+    })();
+
+    try {
+      return await Promise.race([queryPromise, timeoutPromise]);
+    } finally {
+      clearTimeout(timeoutHandle);
+    }
   }
 
   async close() {

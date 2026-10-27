@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -35,7 +35,26 @@ export function StaffLoginPage() {
   const [selectedRoleEmail, setSelectedRoleEmail] = useState('');
   const [localError, setLocalError] = useState('');
 
-  const destination = location.state?.from || '/staff';
+  const [demoLoginAvailable, setDemoLoginAvailable] = useState(!import.meta.env.PROD);
+
+  // If in dev mode, also synchronize with server session endpoint
+  useEffect(() => {
+    if (import.meta.env.PROD) return;
+    let mounted = true;
+    fetch('/api/auth/session')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (mounted && data && typeof data.demoLoginEnabled === 'boolean') {
+          setDemoLoginAvailable(data.demoLoginEnabled);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const showDemoPresets = !import.meta.env.PROD && !isFirebaseMode && demoLoginAvailable;
 
   // If already authenticated, redirect immediately
   if (isAuthenticated) {
@@ -75,8 +94,8 @@ export function StaffLoginPage() {
           </div>
         )}
 
-        {/* Demo Mode Quick Credentials Selector */}
-        {!isFirebaseMode && (
+        {/* Demo Mode Quick Credentials Selector (Development evaluation only; never rendered in production) */}
+        {showDemoPresets && (
           <>
             <div className="demo-credentials-box">
               <span className="demo-credentials-title">Demo Mode Roles (Click to fill email):</span>

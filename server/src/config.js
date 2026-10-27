@@ -7,10 +7,31 @@ if (!['demo', 'firebase', 'postgres'].includes(dataMode)) {
   throw new Error('DATA_MODE must be one of "demo", "firebase", or "postgres".');
 }
 
+const rawEnableDemoLogin = (process.env.ENABLE_DEMO_LOGIN || '').trim().toLowerCase();
+const enableDemoLogin = dataMode === 'demo'
+  ? rawEnableDemoLogin !== 'false' && rawEnableDemoLogin !== '0'
+  : (dataMode === 'postgres' && (rawEnableDemoLogin === 'true' || rawEnableDemoLogin === '1'));
+
+const databaseSsl = (() => {
+  const rawSsl = (process.env.DATABASE_SSL || process.env.PGSSLMODE || '').trim().toLowerCase();
+  const isSslEnabled = ['true', '1', 'require', 'verify-ca', 'verify-full'].includes(rawSsl);
+  if (!isSslEnabled) return false;
+
+  const rejectUnauthorized = process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== 'false';
+  const ca = process.env.DATABASE_SSL_CA ? process.env.DATABASE_SSL_CA.replace(/\\n/g, '\n') : undefined;
+
+  return {
+    rejectUnauthorized,
+    ...(ca ? { ca } : {}),
+  };
+})();
+
 export const config = {
   port: Number(process.env.PORT || 4000),
   dataMode,
   databaseUrl: process.env.DATABASE_URL,
+  databaseSsl,
+  enableDemoLogin,
   corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:5173')
     .split(',')
     .map((value) => value.trim())

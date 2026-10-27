@@ -24,6 +24,7 @@ export class InMemoryStorageAdapter {
     this.auditEvents = [];
     this.users = new Map(SEED_USERS.map((u) => [u.id, structuredClone(u)]));
     this.usersByEmail = new Map(SEED_USERS.map((u) => [u.email.toLowerCase(), structuredClone(u)]));
+    this.passwordHashes = new Map(); // key: userId / email
   }
 
   async seedIfEmpty() {
@@ -53,6 +54,31 @@ export class InMemoryStorageAdapter {
     return user ? structuredClone(user) : null;
   }
 
+  getUserPasswordHashByEmail(email) {
+    if (!email) return null;
+    const user = this.usersByEmail.get(String(email).trim().toLowerCase());
+    if (!user) return null;
+    const passwordHash = this.passwordHashes.get(user.id) || this.passwordHashes.get(user.email) || null;
+    return {
+      id: user.id,
+      email: user.email,
+      status: user.status,
+      passwordHash,
+    };
+  }
+
+  setUserPassword(userIdOrEmail, passwordHash) {
+    if (!userIdOrEmail || !passwordHash) {
+      throw new Error('User identifier and password hash are required.');
+    }
+    const target = String(userIdOrEmail).trim().toLowerCase();
+    const user = this.users.get(target) || this.usersByEmail.get(target);
+    if (!user) return null;
+    this.passwordHashes.set(user.id, passwordHash);
+    this.passwordHashes.set(user.email, passwordHash);
+    return structuredClone(user);
+  }
+
   registerUser(userData) {
     const id = userData.id || `user-${randomUUID()}`;
     const user = {
@@ -67,6 +93,10 @@ export class InMemoryStorageAdapter {
     };
     this.users.set(id, user);
     this.usersByEmail.set(user.email, user);
+    if (userData.passwordHash) {
+      this.passwordHashes.set(id, userData.passwordHash);
+      this.passwordHashes.set(user.email, userData.passwordHash);
+    }
     return structuredClone(user);
   }
 
@@ -676,5 +706,13 @@ export class InMemoryStorageAdapter {
     });
 
     return structuredClone(updated);
+  }
+
+  async ping() {
+    return { ok: true };
+  }
+
+  async close() {
+    return;
   }
 }

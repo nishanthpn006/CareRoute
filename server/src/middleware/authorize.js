@@ -21,20 +21,9 @@ export async function authenticate(req, res, next) {
     if (config.dataMode === 'demo' || config.dataMode === 'postgres') {
       const decoded = jwt.verify(token, config.jwtSecret);
       const email = String(decoded.email || decoded.sub || '').toLowerCase();
-      let user = await domainStore.getUserByEmail(email);
+      const user = await domainStore.getUserByEmail(email);
 
-      // If legacy demo login or test token with email not in seed users, generate mapped principal
-      if (!user && decoded.role) {
-        user = {
-          id: decoded.uid || `user-${decoded.role}`,
-          email,
-          role: decoded.role,
-          status: 'active',
-          organizationId: decoded.organizationId || null,
-          assignedFacilityIds: Array.isArray(decoded.assignedFacilityIds) ? decoded.assignedFacilityIds : [],
-        };
-      }
-
+      // Do not synthesize fallback accounts; tokens for missing or deleted users are rejected
       req.user = user || null;
       return next();
     }

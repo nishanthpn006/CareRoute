@@ -9,9 +9,12 @@
     "start": "node src/index.js",
     "migrate": "node src/lib/storage/migrate.js",
     "seed": "node src/lib/storage/seed.js",
+    "correct-probe": "node src/lib/storage/correctVerificationProbe.js",
+    "set-password": "node src/scripts/setPassword.js",
     "test": "node --test"
   },
   "dependencies": {
+    "argon2": "^0.45.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.3.0",

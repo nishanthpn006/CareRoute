@@ -17,7 +17,13 @@ export function createStorageAdapter(mode = config.dataMode, db = null) {
         'PostgreSQL mode is enabled (DATA_MODE=postgres), but DATABASE_URL is not configured. Check server/.env.'
       );
     }
-    const pool = new Pool({ connectionString: config.databaseUrl });
+    const poolConfig = {
+      connectionString: config.databaseUrl,
+    };
+    if (config.databaseSsl) {
+      poolConfig.ssl = config.databaseSsl;
+    }
+    const pool = new Pool(poolConfig);
     return new PostgresStorageAdapter(pool);
   }
 
