@@ -18,7 +18,7 @@ export async function authenticate(req, res, next) {
   }
 
   try {
-    if (config.dataMode === 'demo') {
+    if (config.dataMode === 'demo' || config.dataMode === 'postgres') {
       const decoded = jwt.verify(token, config.jwtSecret);
       const email = String(decoded.email || decoded.sub || '').toLowerCase();
       let user = await domainStore.getUserByEmail(email);

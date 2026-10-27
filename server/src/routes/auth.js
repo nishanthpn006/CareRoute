@@ -13,8 +13,8 @@ function safeEqual(left, right) {
 }
 
 authRouter.post('/demo-login', async (req, res) => {
-  if (config.dataMode !== 'demo') {
-    return res.status(404).json({ error: 'Demo login is disabled outside demo mode.' });
+  if (config.dataMode === 'firebase') {
+    return res.status(404).json({ error: 'Demo login is disabled in Firebase mode.' });
   }
   const email = String(req.body?.email || '').trim().toLowerCase();
   const password = String(req.body?.password || '');
@@ -55,7 +55,7 @@ authRouter.post('/demo-login', async (req, res) => {
       assignedFacilityIds: user.assignedFacilityIds || [],
     },
     expiresInSeconds: 8 * 60 * 60,
-    mode: 'demo',
+    mode: config.dataMode,
   });
 });
 

@@ -1,13 +1,16 @@
 import 'dotenv/config';
 
-const dataMode = (process.env.DATA_MODE || 'demo').trim().toLowerCase();
-if (!['demo', 'firebase'].includes(dataMode)) {
-  throw new Error('DATA_MODE must be either "demo" or "firebase".');
+const isTestRunner = Boolean(process.env.NODE_TEST_CONTEXT) || process.env.npm_lifecycle_event === 'test';
+const rawDataMode = (isTestRunner ? (process.env.TEST_DATA_MODE || 'demo') : (process.env.DATA_MODE || 'demo')).trim().toLowerCase();
+const dataMode = rawDataMode === 'postgresql' ? 'postgres' : rawDataMode;
+if (!['demo', 'firebase', 'postgres'].includes(dataMode)) {
+  throw new Error('DATA_MODE must be one of "demo", "firebase", or "postgres".');
 }
 
 export const config = {
   port: Number(process.env.PORT || 4000),
   dataMode,
+  databaseUrl: process.env.DATABASE_URL,
   corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:5173')
     .split(',')
     .map((value) => value.trim())
@@ -23,6 +26,18 @@ export const config = {
   firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL,
   firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
 };
+
+if (config.dataMode === 'postgres') {
+  if (!config.databaseUrl) {
+    throw new Error('PostgreSQL mode (DATA_MODE=postgres) requires DATABASE_URL to be set in server/.env or your runtime environment.');
+  }
+  if (!config.jwtSecret) {
+    throw new Error('PostgreSQL mode requires JWT_SECRET to be set in server/.env or your runtime environment.');
+  }
+  if (config.jwtSecret.length < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters long.');
+  }
+}
 
 if (config.dataMode === 'demo') {
   console.warn('[CareRoute] DATA_MODE=demo: sample facilities and bed counts are fictional and reset when the server restarts.');

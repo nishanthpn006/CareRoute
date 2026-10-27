@@ -2,11 +2,15 @@
 node_modules/
 **/node_modules/
 
-# Build output
+# Build output and test artifacts
+dist/
+**/dist/
 client/dist/
+coverage/
+**/coverage/
 server/coverage/
 
-# Local secrets and environment
+# Local secrets and environment files
 .env
 .env.*
 !.env.example
@@ -15,10 +19,42 @@ server/coverage/
 !**/.env.example
 serviceAccountKey.json
 *service-account*.json
+credentials.json
+*credentials*.json
+*token*.json
 
-# OS/editor
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+
+# Local database files, backups, and dumps (excluding migration SQL files)
+*.dump
+*.sql.gz
+*.sql.bak
+*.bak
+*.rdb
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+postgres-data/
+**/pgdata/
+**/postgres-data/
+
+# Disposable scratch and development directories
+scratch/
+
+# OS/editor and temporary files
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 *.log
+*.tmp
+*.temp
+*.swp
+*~
