@@ -322,4 +322,40 @@ test('Individual Staff Authentication Suite', async (t) => {
       config.enableDemoLogin = originalDemoLogin;
     }
   });
+
+  await t.test('12. Missing email or password returns 400 Bad Request', async () => {
+    // Password provided, email missing
+    const resNoEmail = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        password: 'SomePassword123!',
+      }),
+    });
+    assert.equal(resNoEmail.status, 400);
+    const dataNoEmail = await resNoEmail.json();
+    assert.equal(dataNoEmail.error, 'Email and password are required.');
+
+    // Email provided, password missing
+    const resNoPassword = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'reporter@mgmgh.local',
+      }),
+    });
+    assert.equal(resNoPassword.status, 400);
+    const dataNoPassword = await resNoPassword.json();
+    assert.equal(dataNoPassword.error, 'Email and password are required.');
+
+    // Both email and password missing
+    const resBothMissing = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    assert.equal(resBothMissing.status, 400);
+    const dataBothMissing = await resBothMissing.json();
+    assert.equal(dataBothMissing.error, 'Email and password are required.');
+  });
 });
